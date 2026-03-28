@@ -286,7 +286,7 @@ function getMyId(){
   try{const tg=window.Telegram&&window.Telegram.WebApp;if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)return String(tg.initDataUnsafe.user.id)}catch(e){}
   return param("uid")||param("user_id")||null;
 }
-function getGid(){return param("gid")||param("group_id")||param("room")||null}
+function getGid(){let g=param("gid")||param("group_id")||param("room")||null;if(g)return g.replace(/_/g,"-");return null}
 
 // ===== FIREBASE =====
 let db=null;
@@ -466,11 +466,56 @@ function renderEnd(){
 
 // ===== BOOT =====
 window.addEventListener("DOMContentLoaded",()=>{
-  try{if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.ready();window.Telegram.WebApp.expand()}}catch(e){}
+  // Init Telegram WebApp
+  try{
+    if(window.Telegram&&window.Telegram.WebApp){
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+  }catch(e){}
+
   myId=getMyId();
-  const gid=getGid();
-  if(!gid){showErr("Параметр <b>gid</b> відсутній.<br>Відкривайте через бота у групі.");return}
-  if(!initFB()){showErr("Помилка Firebase SDK.");return}
+  let gid=getGid();
+
+  // Спроба витягнути gid з Telegram start_param
+  if(!gid){
+    try{
+      const tg=window.Telegram&&window.Telegram.WebApp;
+      if(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.start_param){
+        const sp=tg.initDataUnsafe.start_param; // формат: "mafia_-1001234567890"
+        if(sp.startsWith("mafia_"))gid=sp.replace("mafia_","");
+        else gid=sp;
+      }
+    }catch(e){}
+  }
+
+  if(!gid){
+    showErr(
+      "Не знайдено ID групи.<br><br>"+
+      "Відкрийте Mini App через кнопку від бота у груповому чаті.<br><br>"+
+      "<small style='color:var(--muted)'>Якщо ви розробник — додайте ?gid=ID_ГРУПИ до URL</small>"
+    );
+    return;
+  }
+
+  if(!initFB()){showErr("Помилка завантаження Firebase SDK.<br>Перевірте інтернет-з'єднання.");return}
+
+  // Таймаут 8 сек — якщо Firebase не відповів
+  const timeout=setTimeout(()=>{
+    showErr(
+      "Гру не знайдено або сервер не відповідає.<br><br>"+
+      "Можливі причини:<br>"+
+      "• Гра ще не почалась<br>"+
+      "• Бот ще не налаштований з Firebase<br>"+
+      "• Неправильний ID групи<br><br>"+
+      "<small style='color:var(--muted)'>gid: "+gid+"</small>"
+    );
+  },8000);
+
+  // Перевизначаємо hideLd щоб скасувати таймаут
+  const origHideLd=hideLd;
+  hideLd=()=>{clearTimeout(timeout);origHideLd()};
+
   listenGame(gid);
 });
 </script>

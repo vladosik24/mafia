@@ -169,6 +169,23 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
 .mi-desc{font-size:10px;color:var(--muted);margin-top:1px}
 .mi-check{font-size:13px;color:var(--gold);opacity:0;transition:opacity .2s}
 .mode-item.sel .mi-check{opacity:1}
+
+/* ROOM CARDS */
+.room-card{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .2s,background .15s;position:relative;overflow:hidden}
+.room-card:active{background:var(--s3)}
+.room-card.available{border-color:var(--green2)22}
+.room-card.full{opacity:.5;pointer-events:none}
+.room-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.room-card.available::before{background:linear-gradient(90deg,transparent,var(--green2),transparent)}
+.room-card.full::before{background:linear-gradient(90deg,transparent,var(--muted),transparent)}
+.rc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.rc-code{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:3px}
+.rc-status{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:10px}
+.rc-status.open{background:#082008;color:var(--green2);border:1px solid var(--green2)30}
+.rc-status.full{background:#1a1a1a;color:var(--muted);border:1px solid var(--border2)}
+.rc-info{display:flex;gap:12px;font-size:11px;color:var(--muted)}
+.rc-mode{color:var(--muted2)}
+.rc-players{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -188,11 +205,20 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
         <div class="home-logo">МАФІЯ</div>
         <div class="home-sub">Мультиплеєрна онлайн гра</div>
       </div>
+      <input class="inp" id="my-name" placeholder="Ваше ім'я" maxlength="20">
       <button class="btn btn-gold" onclick="goCreate()">🎮 Створити кімнату</button>
-      <div class="home-divider">або</div>
-      <input class="inp code" id="join-code" placeholder="XXXX" maxlength="4" oninput="this.value=this.value.toUpperCase()">
-      <input class="inp" id="join-name" placeholder="Ваше ім'я" maxlength="20">
-      <button class="btn btn-ghost" onclick="goJoin()">➕ Приєднатися</button>
+      <div class="home-divider">або введіть код</div>
+      <div style="display:flex;gap:8px">
+        <input class="inp code" id="join-code" placeholder="XXXX" maxlength="4" oninput="this.value=this.value.toUpperCase()" style="margin-bottom:0">
+        <button onclick="goJoinCode()" style="background:var(--gold);border:none;border-radius:6px;padding:0 18px;font-family:Jost,sans-serif;font-size:13px;font-weight:700;color:#07070a;cursor:pointer;white-space:nowrap">➔</button>
+      </div>
+      <div style="height:4px"></div>
+      <div class="home-divider">або виберіть кімнату</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="slabel" style="margin:0">Відкриті кімнати</div>
+        <button onclick="loadRooms()" style="background:none;border:none;color:var(--gold);font-family:Jost,sans-serif;font-size:11px;cursor:pointer">↻ Оновити</button>
+      </div>
+      <div id="rooms-list"><div style="color:var(--muted);text-align:center;padding:16px;font-size:12px">Завантаження...</div></div>
     </div>
   </div>
 
@@ -413,18 +439,43 @@ function gotoTab(id){showScr(id);document.querySelectorAll(".tab").forEach(b=>b.
 // INIT
 // ============================================================
 function initApp(){
-  try{if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.ready();window.Telegram.WebApp.expand()}}catch(err){}
-  myId=localStorage.getItem("mafia_uid")||genId();
+  try{
+    if(window.Telegram&&window.Telegram.WebApp){
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+      var tgUser = window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
+      if(tgUser){
+        // Ім'я з Telegram
+        var tgName = (tgUser.first_name||"") + (tgUser.last_name?" "+tgUser.last_name:"");
+        var nameEl = document.getElementById("my-name");
+        if(nameEl && tgName) nameEl.value = tgName;
+        // ID з Telegram
+        if(tgUser.id) myId = String(tgUser.id);
+      }
+    }
+  }catch(err){}
+  if(!myId){ myId=localStorage.getItem("mafia_uid")||genId(); }
   localStorage.setItem("mafia_uid",myId);
+  // Pre-fill name from localStorage if not from Telegram
+  var nameEl = document.getElementById("my-name");
+  if(nameEl && !nameEl.value){
+    var saved = localStorage.getItem("mafia_name");
+    if(saved) nameEl.value = saved;
+  }
   renderModes();
   hideLd();
 }
-function hideLd(){const l=e("loading");l.style.opacity="0";setTimeout(()=>l.style.display="none",400);e("app").style.display="flex"}
+function hideLd(){const l=e("loading");l.style.opacity="0";setTimeout(()=>l.style.display="none",400);e("app").style.display="flex";setTimeout(loadRooms,300)}
 
 // ============================================================
 // CREATE ROOM
 // ============================================================
-function goCreate(){showScr("sc-create")}
+function goCreate(){
+  var n = document.getElementById("my-name");
+  var hn = document.getElementById("host-name");
+  if(n && n.value.trim() && hn) hn.value = n.value.trim();
+  showScr("sc-create");
+}
 function renderModes(){
   e("mode-list").innerHTML=CAMODES.map(m=>`
     <div class="mode-item${selMode===m.k?" sel":""}" onclick="pickMode('${m.k}')">
@@ -436,8 +487,9 @@ function renderModes(){
 function pickMode(k){selMode=k;renderModes()}
 
 async function createRoom(){
-  const name=(e("host-name").value||"").trim();
+  const name=(e("host-name").value||getName()||"").trim();
   if(!name){toast("Введіть ваше ім'я!");return}
+  localStorage.setItem("mafia_name",name);
   myName=name; isHost=true;
   myCode=genCode();
   const hostPlayer={uid:myId,name,role:"citizen",alive:true,isHost:true};
@@ -462,9 +514,11 @@ async function createRoom(){
 // ============================================================
 async function goJoin(){
   const code=(e("join-code").value||"").trim().toUpperCase();
-  const name=(e("join-name").value||"").trim();
+  const jn=e("join-name");
+  const name=getName()||((jn&&jn.value)||"").trim();
   if(!code||code.length!==4){toast("Введіть 4-значний код!");return}
-  if(!name){toast("Введіть ваше ім'я!");return}
+  if(!name){toast("Введіть ваше ім'я!");document.getElementById("my-name").focus();return}
+  if(name)localStorage.setItem("mafia_name",name);
   myName=name; isHost=false; myCode=code;
   const snap=await db.ref("rooms/"+code).get();
   if(!snap.exists()){toast("Кімнату не знайдено!");return}
@@ -918,6 +972,80 @@ function leaveRoom(){
   clearInterval(timerIv);
   voted=false;selVote=null;roleRevealed=false;gd=null;myCode="";isHost=false;
   showScr("sc-home");
+}
+
+
+// ============================================================
+// ROOMS LIST
+// ============================================================
+let roomsRef = null;
+
+function loadRooms(){
+  const el = document.getElementById('rooms-list');
+  if(el) el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:16px;font-size:12px">Завантаження...</div>';
+  if(roomsRef) roomsRef.off();
+  roomsRef = window.db.ref('rooms').orderByChild('created').limitToLast(20);
+  roomsRef.on('value', function(snap){
+    const data = snap.val();
+    renderRoomsList(data);
+  });
+}
+
+function renderRoomsList(data){
+  var el = document.getElementById("rooms-list");
+  if(!el) return;
+  var MI = {classic:"🎮",silence:"🔇",speed:"⚡",chaos:"🌀",hardcore:"💀",spring:"🌸"};
+  var MN = {classic:"Класика",silence:"Мовчанка",speed:"Швидка",chaos:"Хаос",hardcore:"Хардкор",spring:"Весняний"};
+  if(!data){ el.innerHTML="<div style='color:var(--muted);text-align:center;padding:20px;font-size:12px'>Немає відкритих кімнат</div>"; return; }
+  var rooms = Object.values(data).filter(function(r){ return !r.finished && r.code; }).reverse();
+  if(!rooms.length){ el.innerHTML="<div style='color:var(--muted);text-align:center;padding:20px;font-size:12px'>Немає відкритих кімнат</div>"; return; }
+  el.innerHTML = rooms.map(function(r){
+    var players = Object.values(r.players||{});
+    var cnt = players.length;
+    var mode = r.mode||"classic";
+    var started = r.started;
+    var isFull = started || cnt >= 10;
+    var statusText = started ? "Йде" : (cnt>=10 ? "Повна" : "Відкрита");
+    var statusClass = isFull ? "full" : "open";
+    var cardClass = isFull ? "full" : "available";
+    var host = players.find(function(p){ return p.isHost; });
+    var hostName = host ? host.name : "???";
+    var clickAttr = isFull ? "" : (" onclick=\"joinFromList('" + r.code + "')\"");
+    return "<div class='room-card " + cardClass + "'" + clickAttr + ">" +
+      "<div class='rc-head'>" +
+        "<div class='rc-code'>" + r.code + "</div>" +
+        "<div class='rc-status " + statusClass + "'>" + statusText + "</div>" +
+      "</div>" +
+      "<div class='rc-info'>" +
+        "<span class='rc-mode'>" + (MI[mode]||"🎮") + " " + (MN[mode]||mode) + "</span>" +
+        "<span class='rc-players'>👥 " + cnt + " гравців</span>" +
+        "<span>Ведучий: " + hostName + "</span>" +
+      "</div>" +
+    "</div>";
+  }).join("");
+}
+
+function getName(){
+  var n = document.getElementById("my-name");
+  return n ? n.value.trim() : "";
+}
+
+function joinFromList(code){
+  var name = getName();
+  if(!name){ toast("Спочатку введіть ваше ім'я!"); document.getElementById("my-name").focus(); return; }
+  document.getElementById("join-code").value = code;
+  goJoinCode();
+}
+
+function goJoinCode(){
+  var code = (document.getElementById("join-code").value||"").trim().toUpperCase();
+  var name = getName();
+  if(!code||code.length!==4){ toast("Введіть 4-значний код!"); return; }
+  if(!name){ toast("Введіть ваше ім'я!"); document.getElementById("my-name").focus(); return; }
+  var jn = document.getElementById("join-name");
+  if(!jn){ jn = document.createElement("input"); jn.id="join-name"; jn.style.display="none"; document.body.appendChild(jn); }
+  jn.value = name;
+  goJoin();
 }
 
 // ============================================================

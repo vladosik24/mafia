@@ -446,9 +446,14 @@ function initFirebase(){
   try{
     if(!firebase.apps.length){
       firebase.initializeApp({
-        apiKey:"AIzaSyC_placeholder",
+        apiKey:"AIzaSyD733ecBu7udRaZrDJoou8R4ssoWRvWk5Y",
+        authDomain:"mafia-bot-d736c.firebaseapp.com",
         databaseURL:"https://mafia-bot-d736c-default-rtdb.firebaseio.com",
-        projectId:"mafia-bot-d736c"
+        projectId:"mafia-bot-d736c",
+        storageBucket:"mafia-bot-d736c.firebasestorage.app",
+        messagingSenderId:"511710109912",
+        appId:"1:511710109912:web:c64f915cb57090b14537ad",
+        measurementId:"G-JCQV15E03X"
       });
     }
     db=firebase.database();

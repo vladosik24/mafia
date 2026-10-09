@@ -154,6 +154,10 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
 .mode-item{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:10px 12px;margin-bottom:7px;cursor:pointer;transition:border-color .2s}
 .mode-item.sel{border-color:var(--gold);background:#100e00}
 .mi-check{font-size:13px;color:var(--gold);opacity:0;transition:opacity .2s}.mode-item.sel .mi-check{opacity:1}
+.action-card{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px;margin-bottom:12px}
+.action-title{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--gold)}
+.action-desc{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+.action-result{background:var(--s3);border-radius:6px;padding:10px 12px;margin-top:8px;font-size:12px;line-height:1.5}
 #ld{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s}
 .ld-logo{font-family:"Playfair Display",serif;font-size:26px;font-weight:900;letter-spacing:3px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .ld-dots{display:flex;gap:5px}
@@ -170,6 +174,7 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
 <div id="ld"><div class="ld-logo">МАФІЯ</div><div class="ld-dots"><div class="ld-dot"></div><div class="ld-dot"></div><div class="ld-dot"></div></div></div>
 <div class="app" id="app" style="display:none">
 
+<!-- HOME -->
 <div class="screen" id="sc-home">
   <header><div class="logo">Мафіознік 🇺🇦</div><div class="hpill pl">Онлайн</div></header>
   <div class="scroll fi">
@@ -193,6 +198,7 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
   </div>
 </div>
 
+<!-- JOIN -->
 <div class="screen gone" id="sc-join">
   <header><div class="logo">Приєднатись</div></header>
   <div class="scroll fi">
@@ -204,6 +210,7 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
   </div>
 </div>
 
+<!-- CREATE -->
 <div class="screen gone" id="sc-create">
   <header><div class="logo">Нова кімната</div></header>
   <div class="scroll fi">
@@ -215,6 +222,7 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
   </div>
 </div>
 
+<!-- HOST LOBBY -->
 <div class="screen gone" id="sc-hlobby">
   <header><div class="logo">Мафіознік</div><div class="hpill pl">Лобі</div></header>
   <div class="scroll fi">
@@ -226,6 +234,7 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
   </div>
 </div>
 
+<!-- PLAYER LOBBY -->
 <div class="screen gone" id="sc-plobby">
   <header><div class="logo">Мафіознік</div><div class="hpill pl">Очікування</div></header>
   <div class="scroll fi">
@@ -236,63 +245,73 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
   </div>
 </div>
 
+<!-- ROLE -->
 <div class="screen gone" id="sc-role">
   <header><div class="logo">Мафіознік</div><div class="hpill pn" id="role-pill">Роль</div></header>
   <div class="scroll" id="role-scroll"><div class="role-hidden fi" onclick="revealRole()"><div style="font-size:40px;opacity:.3;margin-bottom:10px">🤫</div><h3>Роль прихована</h3><p>Натисніть щоб переглянути</p></div></div>
-  <div class="gtabs"><button class="gtab" data-t="sc-players" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Гравці<div class="tl"></div></button><button class="gtab on" data-t="sc-role" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Роль<div class="tl"></div></button><button class="gtab" data-t="sc-vote" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Голос<div class="tl"></div></button><button class="gtab" data-t="sc-chat" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Чат<div class="tl"></div></button><button class="gtab" data-t="sc-timer" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>Хід<div class="tl"></div></button></div>
+  <div class="gtabs" id="gtabs-role"></div>
 </div>
 
+<!-- PLAYERS -->
 <div class="screen gone" id="sc-players">
   <header><div class="logo">Мафіознік</div><div class="hpill" id="pl-pill">День 1</div></header>
-  <div class="scroll fi"><div class="slabel" style="margin-top:2px">Живі гравці</div><div id="alive-list"></div><div class="slabel" id="dead-label" style="margin-top:10px;display:none">Вибули</div><div id="dead-list"></div><div id="host-player-ctrl"></div></div>
-  <div class="gtabs"><button class="gtab on" data-t="sc-players" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Гравці<div class="tl"></div></button><button class="gtab" data-t="sc-role" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Роль<div class="tl"></div></button><button class="gtab" data-t="sc-vote" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Голос<div class="tl"></div></button><button class="gtab" data-t="sc-chat" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Чат<div class="tl"></div></button><button class="gtab" data-t="sc-timer" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>Хід<div class="tl"></div></button></div>
+  <div class="scroll fi"><div class="slabel" style="margin-top:2px">Живі гравці</div><div id="alive-list"></div><div class="slabel" id="dead-label" style="margin-top:10px;display:none">Вибули</div><div id="dead-list"></div><div id="host-player-ctrl"></div><div id="night-action-area"></div></div>
+  <div class="gtabs" id="gtabs-players"></div>
 </div>
 
+<!-- VOTE -->
 <div class="screen gone" id="sc-vote">
   <header><div class="logo">Мафіознік</div><div class="hpill pv">Голосування</div></header>
   <div class="scroll fi"><div style="text-align:center;padding:12px 0 6px"><div style="font-family:Playfair Display,serif;font-size:21px;color:var(--red);margin-bottom:3px">☠ Вигнати гравця</div><div style="font-size:11px;color:var(--muted)">Оберіть підозрюваного</div></div><div id="vote-list"></div><div class="vstatus" id="vstatus"></div><button class="btn br" id="btnvote" disabled onclick="submitVote()">Підтвердити голос</button><div id="host-vote-ctrl"></div><div style="height:8px"></div></div>
-  <div class="gtabs"><button class="gtab" data-t="sc-players" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Гравці<div class="tl"></div></button><button class="gtab" data-t="sc-role" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Роль<div class="tl"></div></button><button class="gtab on" data-t="sc-vote" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Голос<div class="tl"></div></button><button class="gtab" data-t="sc-chat" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Чат<div class="tl"></div></button><button class="gtab" data-t="sc-timer" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>Хід<div class="tl"></div></button></div>
+  <div class="gtabs" id="gtabs-vote"></div>
 </div>
 
+<!-- CHAT -->
 <div class="screen gone" id="sc-chat">
   <header><div class="logo">Мафіознік</div><div class="hpill pd">Чат</div></header>
   <div class="chat-wrap"><div class="chat-msgs" id="chat-msgs"><div class="chat-sys">Початок чату</div></div><div class="chat-input-row"><input class="chat-input" id="chat-input" placeholder="Повідомлення..." maxlength="200" onkeydown="if(event.key==='Enter')sendChat()"><button class="chat-send" onclick="sendChat()">➤</button></div></div>
-  <div class="gtabs"><button class="gtab" data-t="sc-players" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Гравці<div class="tl"></div></button><button class="gtab" data-t="sc-role" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Роль<div class="tl"></div></button><button class="gtab" data-t="sc-vote" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Голос<div class="tl"></div></button><button class="gtab on" data-t="sc-chat" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Чат<div class="tl"></div></button><button class="gtab" data-t="sc-timer" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>Хід<div class="tl"></div></button></div>
+  <div class="gtabs" id="gtabs-chat"></div>
 </div>
 
+<!-- TIMER -->
 <div class="screen gone" id="sc-timer">
   <header><div class="logo">Мафіознік</div><div class="hpill" id="tm-pill">День 1</div></header>
   <div class="scroll fi"><div class="timer-wrap"><div class="tphl">Поточна фаза</div><div class="tphn" id="tphn">Обговорення</div><div class="ring-wrap"><svg viewBox="0 0 130 130"><circle class="rbg" cx="65" cy="65" r="58"/><circle class="rpg" id="rpg" cx="65" cy="65" r="58" stroke-dasharray="364.42" stroke-dashoffset="0" stroke="var(--gold)"/></svg><div class="ring-inner"><div class="rtime" id="rtime">—:——</div><div class="rlbl">залишилось</div></div></div><div id="host-timer-ctrl"></div></div><div class="slabel">Журнал подій</div><div id="glog"></div><div style="height:10px"></div></div>
-  <div class="gtabs"><button class="gtab" data-t="sc-players" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Гравці<div class="tl"></div></button><button class="gtab" data-t="sc-role" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Роль<div class="tl"></div></button><button class="gtab" data-t="sc-vote" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Голос<div class="tl"></div></button><button class="gtab" data-t="sc-chat" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Чат<div class="tl"></div></button><button class="gtab on" data-t="sc-timer" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>Хід<div class="tl"></div></button></div>
+  <div class="gtabs" id="gtabs-timer"></div>
 </div>
 
+<!-- END -->
 <div class="screen gone" id="sc-end">
   <header><div class="logo">Мафіознік</div><div class="hpill pe">Кінець гри</div></header>
   <div class="scroll fi"><div id="end-content"></div></div>
 </div>
 
+<!-- STATS -->
 <div class="screen gone" id="sc-stats">
   <header><div class="logo">Статистика</div></header>
   <div class="scroll fi"><div class="stat-grid" id="stat-grid"></div><div class="slabel">За ролями</div><div id="role-stats"></div><div style="height:8px"></div><button class="btn bs" onclick="showScr('sc-home')">← Назад</button></div>
   <div class="bnav"><button class="bntab" onclick="showScr('sc-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Головна<div class="tl"></div></button><button class="bntab" onclick="loadLB();showScr('sc-lb')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>Рейтинг<div class="tl"></div></button><button class="bntab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Статистика<div class="tl"></div></button><button class="bntab" onclick="showScr('sc-settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Налаштування<div class="tl"></div></button></div>
 </div>
 
+<!-- LEADERBOARD -->
 <div class="screen gone" id="sc-lb">
   <header><div class="logo">Рейтинг</div><div class="hpill pd">Топ</div></header>
   <div class="scroll fi"><div id="lb-list"><div style="color:var(--muted);text-align:center;padding:20px;font-size:12px">Завантаження...</div></div></div>
   <div class="bnav"><button class="bntab" onclick="showScr('sc-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Головна<div class="tl"></div></button><button class="bntab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>Рейтинг<div class="tl"></div></button><button class="bntab" onclick="renderStats();showScr('sc-stats')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Статистика<div class="tl"></div></button><button class="bntab" onclick="showScr('sc-settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Налаштування<div class="tl"></div></button></div>
 </div>
 
+<!-- RULES -->
 <div class="screen gone" id="sc-rules">
   <header><div class="logo">Правила гри</div></header>
   <div class="scroll fi">
-    <div class="card"><div class="ca cag"></div><div style="font-size:12px;color:var(--muted2);line-height:1.8">Ведучий створює кімнату та запрошує гравців за кодом. Після старту кожен отримує таємну роль. Гра чергує <b style="color:var(--gold)">ніч</b> та <b style="color:var(--gold)">день</b>. Вночі мафія вбиває жертву, вдень місто голосує щоб вигнати підозрюваного.</div></div>
+    <div class="card"><div class="ca cag"></div><div style="font-size:12px;color:var(--muted2);line-height:1.8">Ведучий створює кімнату та запрошує гравців за кодом. Після старту кожен отримує таємну роль. Гра чергує <b style="color:var(--gold)">ніч</b> та <b style="color:var(--gold)">день</b>. Вночі спеціальні ролі виконують дії, вдень місто голосує щоб вигнати підозрюваного.</div></div>
     <div class="slabel" style="margin-top:4px">Ролі</div><div id="rules-roles"></div>
     <div class="slabel" style="margin-top:12px">Режими</div><div id="rules-modes"></div>
     <div style="height:8px"></div><button class="btn bs" onclick="showScr('sc-home')">← Назад</button><div style="height:8px"></div>
   </div>
 </div>
 
+<!-- SETTINGS -->
 <div class="screen gone" id="sc-settings">
   <header><div class="logo">Налаштування</div></header>
   <div class="scroll fi">
@@ -306,16 +325,44 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
 </div>
 
 </div>
-<div class="toast" id="toast"></div><script>
-var ROLES={mafia:{icon:"🔫",name:"Мафія",t:"m",desc:"Вночі обирайте жертву разом із командою.",ab:"Нічне вбивство"},don:{icon:"👑",name:"Дон",t:"m",desc:"Лідер мафії. Імунний до перевірки шерифа.",ab:"Вбивство + імунітет"},sheriff:{icon:"👮",name:"Шериф",t:"c",desc:"Перевіряєш одного гравця щоночі.",ab:"Перевірка гравця"},doctor:{icon:"🩺",name:"Доктор",t:"c",desc:"Рятуєш одного гравця від смерті за ніч.",ab:"Порятунок від вбивства"},guard:{icon:"🛡️",name:"Охоронець",t:"c",desc:"Захищаєш гравця від маніяка щоночі.",ab:"Захист від маніяка"},citizen:{icon:"👤",name:"Мирний",t:"c",desc:"Голосуй вдень. Шукай мафію.",ab:"Голос на голосуванні"},maniac:{icon:"🔪",name:"Маніяк",t:"n",desc:"Граєш сам проти всіх.",ab:"Нічне вбивство (незалежно)"},jester:{icon:"🤡",name:"Блазень",t:"n",desc:"Мета — щоб тебе вигнали голосуванням!",ab:"Перемога при вигнанні"},cupid:{icon:"💘",name:"Купідон",t:"s",desc:"Першої ночі пускаєш стрілу закоханості.",ab:"Перетворення на Коханця"},lover:{icon:"💕",name:"Коханець",t:"s",desc:"Виграєте тільки разом з парою.",ab:"Перемога з парою"}};
-var MODES=[{k:"classic",icon:"🎮",name:"Класика",desc:"Стандартна гра"},{k:"silence",icon:"🔇",name:"Мовчанка",desc:"Анонімне голосування"},{k:"speed",icon:"⚡",name:"Швидка",desc:"Ніч лише 30 секунд"},{k:"chaos",icon:"🌀",name:"Хаос",desc:"Мафія вбиває двох за ніч"},{k:"hardcore",icon:"💀",name:"Хардкор",desc:"Ролі приховані при смерті"},{k:"spring",icon:"🌸",name:"Весняний",desc:"Купідон стріляє закоханістю"}];
-var WIN_DATA={mafia:{emoji:"😈",title:"Перемога Мафії!",ca:"car"},citizens:{emoji:"🎉",title:"Перемога Мирних!",ca:"cab"},maniac:{emoji:"🔪",title:"Перемога Маніяка!",ca:"cag"},lovers:{emoji:"💕",title:"Коханці перемогли!",ca:"cap"},jester:{emoji:"🤡",title:"Блазень переміг!",ca:"cag"}};
+<div class="toast" id="toast"></div>
+
+<script>
+var ROLES={
+  mafia:{icon:"🔫",name:"Мафія",t:"m",desc:"Вночі обирайте жертву разом із командою.",ab:"Нічне вбивство"},
+  don:{icon:"👑",name:"Дон",t:"m",desc:"Лідер мафії. Імунний до перевірки шерифа.",ab:"Вбивство + імунітет"},
+  sheriff:{icon:"👮",name:"Шериф",t:"c",desc:"Перевіряєш одного гравця щоночі.",ab:"Перевірка гравця"},
+  doctor:{icon:"🩺",name:"Доктор",t:"c",desc:"Рятуєш одного гравця від смерті за ніч.",ab:"Порятунок від вбивства"},
+  guard:{icon:"🛡️",name:"Охоронець",t:"c",desc:"Захищаєш гравця від маніяка щоночі.",ab:"Захист від маніяка"},
+  citizen:{icon:"👤",name:"Мирний",t:"c",desc:"Голосуй вдень. Шукай мафію.",ab:"Голос на голосуванні"},
+  maniac:{icon:"🔪",name:"Маніяк",t:"n",desc:"Граєш сам проти всіх.",ab:"Нічне вбивство (незалежно)"},
+  jester:{icon:"🤡",name:"Блазень",t:"n",desc:"Мета — щоб тебе вигнали голосуванням!",ab:"Перемога при вигнанні"},
+  cupid:{icon:"💘",name:"Купідон",t:"s",desc:"Першої ночі пускаєш стрілу закоханості.",ab:"Перетворення на Коханця"},
+  lover:{icon:"💕",name:"Коханець",t:"s",desc:"Виграєте тільки разом з парою.",ab:"Перемога з парою"}
+};
+var MODES=[
+  {k:"classic",icon:"🎮",name:"Класика",desc:"Стандартна гра"},
+  {k:"silence",icon:"🔇",name:"Мовчанка",desc:"Анонімне голосування (без лічильників)"},
+  {k:"speed",icon:"⚡",name:"Швидка",desc:"Ніч 30 сек, день 90 сек"},
+  {k:"chaos",icon:"🌀",name:"Хаос",desc:"Мафія може вбити двох за ніч"},
+  {k:"hardcore",icon:"💀",name:"Хардкор",desc:"Ролі приховані при смерті"},
+  {k:"spring",icon:"🌸",name:"Весняний",desc:"Купідон стріляє закоханістю"}
+];
+var WIN_DATA={
+  mafia:{emoji:"😈",title:"Перемога Мафії!",ca:"car"},
+  citizens:{emoji:"🎉",title:"Перемога Мирних!",ca:"cab"},
+  maniac:{emoji:"🔪",title:"Перемога Маніяка!",ca:"cag"},
+  lovers:{emoji:"💕",title:"Коханці перемогли!",ca:"cap"},
+  jester:{emoji:"🤡",title:"Блазень переміг!",ca:"cag"}
+};
 var TC={m:"rtm",c:"rtc",s:"rts",n:"rtn"};
 var MI={classic:"🎮",silence:"🔇",speed:"⚡",chaos:"🌀",hardcore:"💀",spring:"🌸"};
 var MN={classic:"Класика",silence:"Мовчанка",speed:"Швидка",chaos:"Хаос",hardcore:"Хардкор",spring:"Весняний"};
+
 var myId=null,myName="",myCode="",isHost=false,gd=null,gameRef=null,chatRef=null,timerIv=null;
 var locSec=0,locMax=60,locPhase="day",selVote=null,voted=false,roleRevealed=false,selMode="classic";
 var myStats={games:0,wins:0,roles:{}};
+var nightActionDone=false,selNightTarget=null,selNightTarget2=null;
 var db=null;
 var e=function(id){return document.getElementById(id);};
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
@@ -325,17 +372,46 @@ function genId(){return Math.random().toString(36).slice(2,10)+Math.random().toS
 function genCode(){var c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",r="";for(var i=0;i<4;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
 function pArr(){return gd?Object.values(gd.players||{}):[]}
 function myPlayer(){return gd?Object.values(gd.players||{}).find(function(p){return p.uid===myId;})||null:null;}
+
 var ALL=["sc-home","sc-join","sc-create","sc-hlobby","sc-plobby","sc-role","sc-players","sc-vote","sc-chat","sc-timer","sc-end","sc-stats","sc-lb","sc-rules","sc-settings"];
 function showScr(id){ALL.forEach(function(s){e(s).classList.add("gone");});e(id).classList.remove("gone");}
 function ggt(btn){var t=btn.getAttribute("data-t");goGameTab(t);}
 function goGameTab(id){showScr(id);document.querySelectorAll(".gtab").forEach(function(b){b.getAttribute("data-t")===id?b.classList.add("on"):b.classList.remove("on");});}
+
+function buildGtabs(){
+  var html=`<button class="gtab" data-t="sc-players" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Гравці<div class="tl"></div></button>
+  <button class="gtab" data-t="sc-role" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Роль<div class="tl"></div></button>
+  <button class="gtab" data-t="sc-vote" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Голос<div class="tl"></div></button>
+  <button class="gtab" data-t="sc-chat" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Чат<div class="tl"></div></button>
+  <button class="gtab" data-t="sc-timer" onclick="ggt(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>Хід<div class="tl"></div></button>`;
+  ["gtabs-role","gtabs-players","gtabs-vote","gtabs-chat","gtabs-timer"].forEach(function(id){var el=e(id);if(el)el.innerHTML=html;});
+}
+
 function initFirebase(){
   if(typeof firebase==="undefined")return false;
-  try{if(!firebase.apps.length){firebase.initializeApp({apiKey:"AIzaSyC_placeholder",databaseURL:"https://mafia-bot-d736c-default-rtdb.firebaseio.com",projectId:"mafia-bot-d736c"});}db=firebase.database();return true;}catch(err){return false;}
+  try{
+    if(!firebase.apps.length){
+      firebase.initializeApp({
+        apiKey:"AIzaSyC_placeholder",
+        databaseURL:"https://mafia-bot-d736c-default-rtdb.firebaseio.com",
+        projectId:"mafia-bot-d736c"
+      });
+    }
+    db=firebase.database();
+    return true;
+  }catch(err){return false;}
 }
+
 function initApp(){
   var tgName=null,tgId=null;
-  try{if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.ready();window.Telegram.WebApp.expand();var u=window.Telegram.WebApp.initDataUnsafe&&window.Telegram.WebApp.initDataUnsafe.user;if(u){tgName=((u.first_name||"")+" "+(u.last_name||"")).trim();tgId=String(u.id);}}}catch(err){}
+  try{
+    if(window.Telegram&&window.Telegram.WebApp){
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+      var u=window.Telegram.WebApp.initDataUnsafe&&window.Telegram.WebApp.initDataUnsafe.user;
+      if(u){tgName=((u.first_name||"")+" "+(u.last_name||"")).trim();tgId=String(u.id);}
+    }
+  }catch(err){}
   myId=tgId||localStorage.getItem("mafia_uid")||genId();
   localStorage.setItem("mafia_uid",myId);
   var savedName=localStorage.getItem("mafia_name");
@@ -349,18 +425,34 @@ function initApp(){
   var sd=e("user-stat-d");if(sd)sd.textContent="Ігор: "+myStats.games+" · Перемог: "+myStats.wins;
   var avs=["😎","🧔","👩","🧑","👱","👩‍💼","🧑‍💼","👨","👩‍🦱"];
   var av=e("user-ava");if(av)av.textContent=avs[myId.charCodeAt(0)%avs.length];
+  buildGtabs();
   renderModes();renderRules();hideLd();
   setTimeout(loadRooms,400);
 }
-function saveName(){var n=(e("settings-name").value||"").trim();if(!n){toast("Введіть ім'я!");return;}myName=n;localStorage.setItem("mafia_name",n);var nd=e("user-name-d");if(nd)nd.textContent=n;toast("✓ Збережено: "+n);}
-function hideLd(){var l=e("ld");l.style.opacity="0";setTimeout(function(){l.style.display="none";},400);e("app").style.display="flex";}
+
+function saveName(){
+  var n=(e("settings-name").value||"").trim();
+  if(!n){toast("Введіть ім'я!");return;}
+  myName=n;localStorage.setItem("mafia_name",n);
+  var nd=e("user-name-d");if(nd)nd.textContent=n;
+  toast("✓ Збережено: "+n);
+}
+
+function hideLd(){
+  var l=e("ld");l.style.opacity="0";
+  setTimeout(function(){l.style.display="none";},400);
+  e("app").style.display="flex";
+}
+
 var roomsRef=null;
 function loadRooms(){
-  var el=e("rooms-list");if(el)el.innerHTML="<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Завантаження...</div>";
+  var el=e("rooms-list");
+  if(el)el.innerHTML="<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Завантаження...</div>";
   if(roomsRef)roomsRef.off();
   roomsRef=db.ref("rooms").orderByChild("created").limitToLast(20);
   roomsRef.on("value",function(snap){renderRoomsList(snap.val());});
 }
+
 function renderRoomsList(data){
   var el=e("rooms-list");if(!el)return;
   if(!data){el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Немає відкритих кімнат</div>";return;}
@@ -369,8 +461,8 @@ function renderRoomsList(data){
   el.innerHTML=rooms.map(function(r){
     var players=Object.values(r.players||{});
     var cnt=players.length,mode=r.mode||"classic",started=r.started;
-    var full=started||cnt>=10;
-    var statusText=started?"Гра йде":(cnt>=10?"Повна":"Відкрита");
+    var full=started||cnt>=12;
+    var statusText=started?"Гра йде":(cnt>=12?"Повна":"Відкрита");
     var host=players.find(function(p){return p.isHost;});
     var hostName=host?esc(host.name):"???";
     var cls=full?"busy":"avail";
@@ -378,19 +470,34 @@ function renderRoomsList(data){
     return "<div class='room-card "+cls+"'"+click+"><div class='rc-head'><div class='rc-code'>"+r.code+"</div><div class='rc-badge "+(full?"busy":"open")+"'>"+statusText+"</div></div><div class='rc-info'><span>"+(MI[mode]||"🎮")+" "+(MN[mode]||mode)+"</span><span>👥 "+cnt+" гравців</span><span>"+hostName+"</span></div></div>";
   }).join("");
 }
+
 function joinFromList(code){var jc=e("join-code");if(jc)jc.value=code;goJoin(code);}
+
 function renderModes(){
   var el=e("mode-list");if(!el)return;
-  el.innerHTML=MODES.map(function(m){return "<div class='mode-item"+(selMode===m.k?" sel":"")+"' onclick='pickMode(\""+m.k+"\")'>"+m.icon+" <div style='flex:1'><div style='font-size:12px;font-weight:600'>"+m.name+"</div><div style='font-size:10px;color:var(--muted)'>"+m.desc+"</div></div><div class='mi-check'>✓</div></div>";}).join("");
+  el.innerHTML=MODES.map(function(m){
+    return "<div class='mode-item"+(selMode===m.k?" sel":"")+"' onclick='pickMode(\""+m.k+"\")'>"+m.icon+" <div style='flex:1'><div style='font-size:12px;font-weight:600'>"+m.name+"</div><div style='font-size:10px;color:var(--muted)'>"+m.desc+"</div></div><div class='mi-check'>✓</div></div>";
+  }).join("");
 }
 function pickMode(k){selMode=k;renderModes();}
+
 function createRoom(){
   myCode=genCode();isHost=true;
   var me={uid:myId,name:myName,role:"citizen",alive:true,isHost:true};
-  var room={code:myCode,mode:selMode,phase:"lobby",round:1,started:false,finished:false,players:{},votes:{},log:[],chat:[],timer_ends:0,timer_max:60,host_uid:myId,created:Date.now()};
+  var room={
+    code:myCode,mode:selMode,phase:"lobby",round:1,started:false,finished:false,
+    players:{},votes:{},actions:{},log:[],chat:[],
+    timer_ends:0,timer_max:60,host_uid:myId,created:Date.now(),
+    nightResolved:false
+  };
   room.players[myId]=me;
-  db.ref("rooms/"+myCode).set(room).then(function(){e("hl-code").textContent=myCode;listenRoom(myCode);showScr("sc-hlobby");}).catch(function(err){toast("Помилка: "+err.message);});
+  db.ref("rooms/"+myCode).set(room).then(function(){
+    e("hl-code").textContent=myCode;
+    listenRoom(myCode);
+    showScr("sc-hlobby");
+  }).catch(function(err){toast("Помилка: "+err.message);});
 }
+
 function goJoin(codeOverride){
   var code=codeOverride||(e("join-code")?(e("join-code").value||"").trim().toUpperCase():"");
   if(!code||code.length!==4){toast("Введіть 4-значний код!");return;}
@@ -402,99 +509,298 @@ function goJoin(codeOverride){
     if(room.started){toast("Гра вже почалась!");return;}
     if(room.finished){toast("Гра вже завершена!");return;}
     return db.ref("rooms/"+code+"/players/"+myId).set(me);
-  }).then(function(){var pc=e("pl-code");if(pc)pc.textContent=code;listenRoom(code);showScr("sc-plobby");}).catch(function(err){if(err)toast("Помилка: "+err.message);});
+  }).then(function(){
+    var pc=e("pl-code");if(pc)pc.textContent=code;
+    listenRoom(code);
+    showScr("sc-plobby");
+  }).catch(function(err){if(err)toast("Помилка: "+err.message);});
 }
+
 function listenRoom(code){
   if(gameRef)gameRef.off();
   gameRef=db.ref("rooms/"+code);
-  gameRef.on("value",function(snap){var d=snap.val();if(!d)return;gd=d;onUpdate();});
+  gameRef.on("value",function(snap){
+    var d=snap.val();
+    if(!d)return;
+    gd=d;
+    onUpdate();
+  });
   if(chatRef)chatRef.off();
   chatRef=db.ref("rooms/"+code+"/chat");
   chatRef.on("value",function(snap){renderChat(snap.val());});
 }
+
 function onUpdate(){
   if(!gd)return;
   var phase=gd.phase||"lobby",started=gd.started,finished=gd.finished;
   if(!started&&!finished){
     renderLobbyPlayers();
-    if(isHost){var cnt=Object.keys(gd.players||{}).length;var btn=e("btn-start");if(btn)btn.disabled=cnt<4;var hc=e("hl-cnt");if(hc)hc.textContent=cnt;}
+    if(isHost){
+      var cnt=Object.keys(gd.players||{}).length;
+      var btn=e("btn-start");if(btn)btn.disabled=cnt<4;
+      var hc=e("hl-cnt");if(hc)hc.textContent=cnt;
+    }
     return;
   }
   if(finished){renderEnd();showScr("sc-end");return;}
+
   var arr=pArr(),mp=myPlayer(),round=gd.round||1;
   var pLabel=phase==="night"?"🌙 Ніч "+round:"☀️ День "+round;
   var pCls=phase==="night"?"pn":(phase==="vote"?"pv":"pd");
-  ["pl-pill","tm-pill"].forEach(function(id){var el=e(id);if(el){el.className="hpill "+pCls;el.textContent=pLabel;}});
+  ["pl-pill","tm-pill"].forEach(function(id){
+    var el=e(id);if(el){el.className="hpill "+pCls;el.textContent=pLabel;}
+  });
   var rp=e("role-pill");if(rp)rp.textContent=pLabel;
-  renderPlayers(arr,phase);renderVote(arr,mp);renderTimerTab(phase,round);
+
+  renderPlayers(arr,phase);
+  renderVote(arr,mp);
+  renderTimerTab(phase,round);
+  renderNightActions(mp,arr,phase);
   if(isHost)renderHostControls(phase,round,arr);
-  var rs=e("role-scroll");if(rs&&rs.querySelector(".role-hidden")||true)renderRoleTab(mp,arr);
-  if(started&&(document.getElementById("sc-hlobby")&&!document.getElementById("sc-hlobby").classList.contains("gone")||document.getElementById("sc-plobby")&&!document.getElementById("sc-plobby").classList.contains("gone"))){
-    if(isHost)goGameTab("sc-players");else{renderRoleTab(mp,arr);showScr("sc-role");}
+  renderRoleTab(mp,arr);
+
+  if(started&&(
+    (document.getElementById("sc-hlobby")&&!document.getElementById("sc-hlobby").classList.contains("gone"))||
+    (document.getElementById("sc-plobby")&&!document.getElementById("sc-plobby").classList.contains("gone"))
+  )){
+    if(isHost)goGameTab("sc-players");
+    else{renderRoleTab(mp,arr);showScr("sc-role");}
   }
+
   if(phase==="night"&&!document.getElementById("sc-vote").classList.contains("gone"))goGameTab("sc-players");
-  if(gd.timer_ends){var sec=Math.max(0,Math.floor((gd.timer_ends*1000-Date.now())/1000));startLocalTimer(sec,gd.timer_max||60,phase);}
+  if(gd.timer_ends){
+    var sec=Math.max(0,Math.floor((gd.timer_ends*1000-Date.now())/1000));
+    startLocalTimer(sec,gd.timer_max||60,phase);
+  }
 }
+
 function renderLobbyPlayers(){
   var arr=pArr(),target=isHost?"hl-players":"pl-players";
   var el=e(target);if(!el)return;
-  el.innerHTML=arr.map(function(p){return "<div class='prow fi'><div class='pava'>👤</div><div class='pname'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div>"+(p.isHost?"<span style='font-size:9px;color:var(--gold)'>ВЕДУЧИЙ</span>":"<div class='adot adota'></div>")+"</div>";}).join("")||"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Очікуємо...</div>";
+  el.innerHTML=arr.map(function(p){
+    return "<div class='prow fi'><div class='pava'>👤</div><div class='pname'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div>"+(p.isHost?"<span style='font-size:9px;color:var(--gold)'>ВЕДУЧИЙ</span>":"<div class='adot adota'></div>")+"</div>";
+  }).join("")||"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Очікуємо...</div>";
 }
+
 function hostStart(){
-  var arr=pArr();if(arr.length<4){toast("Потрібно мінімум 4 гравці!");return;}
-  var mode=gd.mode||"classic",withRoles=assignRoles(arr,mode),playersObj={};
+  var arr=pArr();
+  if(arr.length<4){toast("Потрібно мінімум 4 гравці!");return;}
+  var mode=gd.mode||"classic";
+  var withRoles=assignRoles(arr,mode);
+  var playersObj={};
   withRoles.forEach(function(p){playersObj[p.uid]=p;});
-  var tmax=mode==="speed"?60:120;
-  db.ref("rooms/"+myCode).update({started:true,phase:"night",round:1,players:playersObj,votes:{},timer_ends:Math.floor(Date.now()/1000)+tmax,timer_max:tmax,log:[{time:nowStr(),text:"🎮 Гра розпочата. "+arr.length+" гравців."}]});
+  var tmax=mode==="speed"?30:60;
+  db.ref("rooms/"+myCode).update({
+    started:true,phase:"night",round:1,players:playersObj,votes:{},actions:{},
+    timer_ends:Math.floor(Date.now()/1000)+tmax,timer_max:tmax,
+    nightResolved:false,
+    log:[{time:nowStr(),text:"🎮 Гра розпочата. "+arr.length+" гравців. Режим: "+(MN[mode]||mode)}]
+  });
 }
+
 function assignRoles(players,mode){
   var n=players.length,roles=[];
-  if(n>=4)roles.push("mafia","sheriff","doctor");if(n>=5)roles.push("citizen");if(n>=6)roles.push("don");if(n>=7)roles.push("citizen");if(n>=8)roles.push(mode==="spring"?"cupid":"mafia");if(n>=9)roles.push("jester");if(n>=10)roles.push("maniac");if(n>=11)roles.push("guard");
+  if(n>=4)roles.push("mafia","sheriff","doctor");
+  if(n>=5)roles.push("citizen");
+  if(n>=6)roles.push("don");
+  if(n>=7)roles.push("citizen");
+  if(n>=8)roles.push(mode==="spring"?"cupid":"mafia");
+  if(n>=9)roles.push("jester");
+  if(n>=10)roles.push("maniac");
+  if(n>=11)roles.push("guard");
   while(roles.length<n)roles.push("citizen");
-  for(var i=roles.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=roles[i];roles[i]=roles[j];roles[j]=tmp;}
+  for(var i=roles.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var tmp=roles[i];roles[i]=roles[j];roles[j]=tmp;
+  }
   return players.map(function(p,i){return Object.assign({},p,{role:roles[i],alive:true});});
 }
+
 function renderRoleTab(mp,arr){
   var sc=e("role-scroll");if(!sc)return;
-  if(!mp||!mp.role){sc.innerHTML="<div class='role-hidden fi'><div style='font-size:36px;opacity:.3;margin-bottom:10px'>⏳</div><h3>Зачекайте...</h3><p>Роль призначається</p></div>";return;}
-  if(!roleRevealed){sc.innerHTML="<div class='role-hidden fi' onclick='revealRole()'><div style='font-size:40px;opacity:.3;margin-bottom:10px'>🤫</div><h3>Роль прихована</h3><p>Натисніть щоб переглянути.<br>Переконайтеся що ніхто не дивиться!</p></div>";return;}
+  if(!mp||!mp.role){
+    sc.innerHTML="<div class='role-hidden fi'><div style='font-size:36px;opacity:.3;margin-bottom:10px'>⏳</div><h3>Зачекайте...</h3><p>Роль призначається</p></div>";
+    return;
+  }
+  if(!roleRevealed){
+    sc.innerHTML="<div class='role-hidden fi' onclick='revealRole()'><div style='font-size:40px;opacity:.3;margin-bottom:10px'>🤫</div><h3>Роль прихована</h3><p>Натисніть щоб переглянути.<br>Переконайтеся що ніхто не дивиться!</p></div>";
+    return;
+  }
   var r=ROLES[mp.role]||ROLES.citizen,tc=TC[r.t]||"rtc";
   var caMap={m:"car",c:"cab",s:"cap",n:"cag"};
-  var mafiaTeam=arr.filter(function(p){return(p.role==="mafia"||p.role==="don")&&p.uid!==myId;});
+  var mafiaTeam=arr.filter(function(p){return (p.role==="mafia"||p.role==="don")&&p.uid!==myId;});
   var extra="";
-  if((mp.role==="mafia"||mp.role==="don")&&mafiaTeam.length>0)extra="<div class='mafia-team'><div class='mtl'>Команда мафії</div>"+mafiaTeam.map(function(m){return "<div class='mm'><div class='mmd'></div>"+esc(m.name)+"</div>";}).join("")+"</div>";
+  if((mp.role==="mafia"||mp.role==="don")&&mafiaTeam.length>0){
+    extra="<div class='mafia-team'><div class='mtl'>Команда мафії</div>"+mafiaTeam.map(function(m){return "<div class='mm'><div class='mmd'></div>"+esc(m.name)+"</div>";}).join("")+"</div>";
+  }
+  // Show sheriff check result if available
+  if(mp.role==="sheriff"&&gd.sheriffResult){
+    extra+="<div class='action-result' style='margin-top:10px'>🔍 Результат перевірки: <b>"+esc(gd.sheriffResult)+"</b></div>";
+  }
   sc.innerHTML="<div class='card fi'><div class='ca "+(caMap[r.t]||"cab")+"'></div><div style='text-align:center;padding:6px 0'><span class='role-emoji'>"+r.icon+"</span><div class='role-title "+tc+"'>"+r.name+"</div><div class='role-desc'>"+r.desc+"</div><div class='role-ab'><div class='ral'>Здібність</div><div class='rat'>"+r.ab+"</div></div></div>"+extra+"</div><div style='text-align:center;margin-top:6px'><button onclick='roleRevealed=false;renderRoleTab(myPlayer(),pArr())' style='background:none;border:1px solid var(--b2);border-radius:4px;color:var(--muted);padding:7px 14px;font-family:Jost,sans-serif;font-size:10px;cursor:pointer'>🙈 Приховати</button></div><div style='height:8px'></div>";
 }
 function revealRole(){roleRevealed=true;renderRoleTab(myPlayer(),pArr());}
+
 function renderPlayers(arr,phase){
   var alive=arr.filter(function(p){return p.alive;}),dead=arr.filter(function(p){return!p.alive;});
-  var al=e("alive-list");if(al)al.innerHTML=alive.map(function(p){return "<div class='prow fi'><div class='pava'>👤</div><div class='pname'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div><div class='adot adota'></div></div>";}).join("")||"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Немає живих</div>";
+  var al=e("alive-list");
+  if(al)al.innerHTML=alive.map(function(p){
+    return "<div class='prow fi'><div class='pava'>👤</div><div class='pname'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div><div class='adot adota'></div></div>";
+  }).join("")||"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Немає живих</div>";
   var dl=e("dead-label");
-  if(dead.length){if(dl)dl.style.display="";var del=e("dead-list");if(del)del.innerHTML=dead.map(function(p){return "<div class='prow dead fi'><div class='pava' style='opacity:.35'>👤</div><div class='pname' style='text-decoration:line-through'>"+esc(p.name)+"</div><div class='adot adotd'></div></div>";}).join("");}
-  else{if(dl)dl.style.display="none";}
+  if(dead.length){
+    if(dl)dl.style.display="";
+    var del=e("dead-list");
+    if(del)del.innerHTML=dead.map(function(p){
+      var roleName=(gd.mode!=="hardcore"&&p.role)?(ROLES[p.role]?ROLES[p.role].name:"") : "";
+      return "<div class='prow dead fi'><div class='pava' style='opacity:.35'>👤</div><div class='pname' style='text-decoration:line-through'>"+esc(p.name)+(roleName?" <span style='font-size:10px;color:var(--muted)'>("+roleName+")</span>":"")+"</div><div class='adot adotd'></div></div>";
+    }).join("");
+  }else{if(dl)dl.style.display="none";}
 }
+
+function renderNightActions(mp,arr,phase){
+  var area=e("night-action-area");
+  if(!area)return;
+  if(phase!=="night"||!mp||!mp.alive||nightActionDone){
+    area.innerHTML="";
+    return;
+  }
+  var role=mp.role;
+  var aliveOthers=arr.filter(function(p){return p.alive&&p.uid!==myId;});
+  var actions=gd.actions||{};
+  var myAction=actions[myId];
+
+  if(myAction){
+    area.innerHTML="<div class='action-card'><div class='action-title'>✓ Дію подано</div><div class='action-desc'>Очікуємо інших гравців та ведучого...</div></div>";
+    nightActionDone=true;
+    return;
+  }
+
+  var html="";
+  if(role==="mafia"||role==="don"){
+    html="<div class='action-card'><div class='action-title'>🔫 Нічне вбивство</div><div class='action-desc'>Оберіть жертву"+(gd.mode==="chaos"?" (можна двох)":"")+"</div>";
+    aliveOthers.forEach(function(p){
+      html+="<div class='vitem' onclick='selNight(\""+p.uid+"\")'><div class='vava'>👤</div><div class='vname'>"+esc(p.name)+"</div></div>";
+    });
+    if(gd.mode==="chaos"){
+      html+="<div style='margin-top:8px;font-size:11px;color:var(--muted)'>Друга жертва (опціонально)</div>";
+      aliveOthers.forEach(function(p){
+        html+="<div class='vitem' onclick='selNight2(\""+p.uid+"\")'><div class='vava'>👤</div><div class='vname'>"+esc(p.name)+"</div></div>";
+      });
+    }
+    html+="<button class='btn br' id='btn-night-act' disabled onclick='submitNightAction()'>Підтвердити вбивство</button></div>";
+  }else if(role==="sheriff"){
+    html="<div class='action-card'><div class='action-title'>👮 Перевірка</div><div class='action-desc'>Оберіть гравця для перевірки</div>";
+    aliveOthers.forEach(function(p){
+      html+="<div class='vitem' onclick='selNight(\""+p.uid+"\")'><div class='vava'>👤</div><div class='vname'>"+esc(p.name)+"</div></div>";
+    });
+    html+="<button class='btn bg' id='btn-night-act' disabled onclick='submitNightAction()'>Перевірити</button></div>";
+  }else if(role==="doctor"){
+    html="<div class='action-card'><div class='action-title'>🩺 Порятунок</div><div class='action-desc'>Оберіть кого рятувати (можна себе)</div>";
+    arr.filter(function(p){return p.alive;}).forEach(function(p){
+      html+="<div class='vitem' onclick='selNight(\""+p.uid+"\")'><div class='vava'>👤</div><div class='vname'>"+esc(p.name)+(p.uid===myId?" (я)":"")+"</div></div>";
+    });
+    html+="<button class='btn bg' id='btn-night-act' disabled onclick='submitNightAction()'>Врятувати</button></div>";
+  }else if(role==="guard"){
+    html="<div class='action-card'><div class='action-title'>🛡️ Захист</div><div class='action-desc'>Захистіть від маніяка</div>";
+    aliveOthers.forEach(function(p){
+      html+="<div class='vitem' onclick='selNight(\""+p.uid+"\")'><div class='vava'>👤</div><div class='vname'>"+esc(p.name)+"</div></div>";
+    });
+    html+="<button class='btn bg' id='btn-night-act' disabled onclick='submitNightAction()'>Захистити</button></div>";
+  }else if(role==="maniac"){
+    html="<div class='action-card'><div class='action-title'>🔪 Вбивство маніяка</div><div class='action-desc'>Оберіть жертву</div>";
+    aliveOthers.forEach(function(p){
+      html+="<div class='vitem' onclick='selNight(\""+p.uid+"\")'><div class='vava'>👤</div><div class='vname'>"+esc(p.name)+"</div></div>";
+    });
+    html+="<button class='btn br' id='btn-night-act' disabled onclick='submitNightAction()'>Вбити</button></div>";
+  }else if(role==="cupid"&&(gd.round||1)===1){
+    html="<div class='action-card'><div class='action-title'>💘 Стріла Купідона</div><div class='action-desc'>Оберіть двох гравців, які закохаються</div>";
+    aliveOthers.forEach(function(p){
+      html+="<div class='vitem' onclick='selNight(\""+p.uid+"\")'><div class='vava'>👤</div><div class='vname'>"+esc(p.name)+"</div></div>";
+    });
+    html+="<div style='margin-top:8px;font-size:11px;color:var(--muted)'>Другий гравець</div>";
+    aliveOthers.forEach(function(p){
+      html+="<div class='vitem' onclick='selNight2(\""+p.uid+"\")'><div class='vava'>👤</div><div class='vname'>"+esc(p.name)+"</div></div>";
+    });
+    html+="<button class='btn bg' id='btn-night-act' disabled onclick='submitNightAction()'>Закохати</button></div>";
+  }else{
+    area.innerHTML="";
+    return;
+  }
+  area.innerHTML=html;
+}
+
+function selNight(uid){
+  selNightTarget=uid;
+  document.querySelectorAll("#night-action-area .vitem").forEach(function(el){el.classList.remove("sel");});
+  event.currentTarget.classList.add("sel");
+  var btn=e("btn-night-act");
+  if(btn)btn.disabled=!selNightTarget;
+}
+function selNight2(uid){
+  selNightTarget2=uid;
+  var btn=e("btn-night-act");
+  if(btn)btn.disabled=!selNightTarget;
+}
+
+function submitNightAction(){
+  if(!selNightTarget||!myCode)return;
+  var action={target:selNightTarget,target2:selNightTarget2||null,role:myPlayer().role,time:Date.now()};
+  db.ref("rooms/"+myCode+"/actions/"+myId).set(action).then(function(){
+    nightActionDone=true;
+    toast("✓ Дію подано");
+    renderNightActions(myPlayer(),pArr(),"night");
+  });
+}
+
 function renderVote(arr,mp){
   var phase=gd?gd.phase:"day",votes=gd?gd.votes||{}:{};
   var isDay=phase==="day",isAlive=mp&&mp.alive,myVote=myId?votes[myId]:null,alreadyVoted=!!myVote||voted;
   var alive=arr.filter(function(p){return p.alive&&p.uid!==myId;});
   var total=Object.keys(votes).length,cnts={};
   Object.values(votes).forEach(function(uid){cnts[uid]=(cnts[uid]||0)+1;});
+  var silence=gd.mode==="silence";
   var vl=e("vote-list");
-  if(!isDay){if(vl)vl.innerHTML="<div style='text-align:center;padding:20px;color:var(--muted);font-size:13px'><div style='font-size:32px;opacity:.3;margin-bottom:8px'>🌙</div>Голосування вдень</div>";var bv=e("btnvote");if(bv)bv.disabled=true;var vs=e("vstatus");if(vs)vs.textContent="";return;}
-  if(vl)vl.innerHTML=alive.map(function(p){var cnt=cnts[p.uid]||0,pct=total?Math.round(cnt/total*100):0,picked=selVote===p.uid||myVote===p.uid;return "<div class='vitem"+(picked?" sel":"")+(alreadyVoted?" done":"")+"' onclick='selV(\""+p.uid+"\")'>"+  "<div class='vava'>👤</div><div style='flex:1'><div class='vname'>"+esc(p.name)+"</div><div class='vbar'><div class='vbf' style='width:"+pct+"%'></div></div></div><div class='vcnt'>"+(cnt>0?cnt+"🗳":"")+"</div></div>";}).join("")||"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Немає гравців</div>";
+  if(!isDay){
+    if(vl)vl.innerHTML="<div style='text-align:center;padding:20px;color:var(--muted);font-size:13px'><div style='font-size:32px;opacity:.3;margin-bottom:8px'>🌙</div>Голосування вдень</div>";
+    var bv=e("btnvote");if(bv)bv.disabled=true;
+    var vs=e("vstatus");if(vs)vs.textContent="";
+    return;
+  }
+  if(vl)vl.innerHTML=alive.map(function(p){
+    var cnt=cnts[p.uid]||0,pct=total?Math.round(cnt/total*100):0,picked=selVote===p.uid||myVote===p.uid;
+    return "<div class='vitem"+(picked?" sel":"")+(alreadyVoted?" done":"")+"' onclick='selV(\""+p.uid+"\")'>"+
+      "<div class='vava'>👤</div><div style='flex:1'><div class='vname'>"+esc(p.name)+"</div>"+
+      (silence?"":"<div class='vbar'><div class='vbf' style='width:"+pct+"%'></div></div>")+
+      "</div><div class='vcnt'>"+(silence?"":(cnt>0?cnt+"🗳":""))+"</div></div>";
+  }).join("")||"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Немає гравців</div>";
+
   var aliveTotal=arr.filter(function(p){return p.alive;}).length,btn=e("btnvote"),st=e("vstatus");
   if(!isAlive){if(btn)btn.disabled=true;if(st)st.textContent="";}
-  else if(alreadyVoted){if(btn){btn.className="btn bs";btn.disabled=true;btn.textContent="✓ Голос прийнято";}var tgt=alive.find(function(p){return p.uid===(myVote||selVote);});if(st)st.textContent=(tgt?"Ви за: "+tgt.name:"Очікуємо...")+" • "+total+"/"+aliveTotal;}
-  else{if(btn){btn.className="btn br";btn.disabled=!selVote;btn.textContent="Підтвердити голос";}if(st)st.textContent=selVote?(alive.find(function(p){return p.uid===selVote;})||{}).name||"":(total>0?"Проголосували: "+total+"/"+aliveTotal:"Оберіть гравця");}
-  var hvc=e("host-vote-ctrl");if(hvc)hvc.innerHTML=isHost?"<button class='btn bs' style='margin-top:8px' onclick='hostForceVote()'>🏁 Завершити голосування</button>":"";
+  else if(alreadyVoted){
+    if(btn){btn.className="btn bs";btn.disabled=true;btn.textContent="✓ Голос прийнято";}
+    var tgt=alive.find(function(p){return p.uid===(myVote||selVote);});
+    if(st)st.textContent=(tgt?"Ви за: "+tgt.name:"Очікуємо...")+" • "+total+"/"+aliveTotal;
+  }else{
+    if(btn){btn.className="btn br";btn.disabled=!selVote;btn.textContent="Підтвердити голос";}
+    if(st)st.textContent=selVote?(alive.find(function(p){return p.uid===selVote;})||{}).name||"":(total>0?"Проголосували: "+total+"/"+aliveTotal:"Оберіть гравця");
+  }
+  var hvc=e("host-vote-ctrl");
+  if(hvc)hvc.innerHTML=isHost?"<button class='btn bs' style='margin-top:8px' onclick='hostForceVote()'>🏁 Завершити голосування</button>":"";
 }
+
 function selV(uid){if(voted||(gd&&gd.votes&&gd.votes[myId]))return;selVote=uid;renderVote(pArr(),myPlayer());}
 function submitVote(){
-  if(!selVote||voted)return;voted=true;
-  db.ref("rooms/"+myCode+"/votes/"+myId).set(selVote);toast("✓ Голос зараховано!");
+  if(!selVote||voted)return;
+  voted=true;
+  db.ref("rooms/"+myCode+"/votes/"+myId).set(selVote);
+  toast("✓ Голос зараховано!");
   var arr=pArr(),aliveCount=arr.filter(function(p){return p.alive;}).length;
-  db.ref("rooms/"+myCode+"/votes").get().then(function(snap){if(isHost&&Object.keys(snap.val()||{}).length>=aliveCount)hostForceVote();});
+  db.ref("rooms/"+myCode+"/votes").get().then(function(snap){
+    if(isHost&&Object.keys(snap.val()||{}).length>=aliveCount)hostForceVote();
+  });
 }
+
 function renderChat(data){
   var el=e("chat-msgs");if(!el)return;
   if(!data){el.innerHTML="<div class='chat-sys'>Початок чату</div>";return;}
@@ -506,96 +812,329 @@ function renderChat(data){
   }).join("");
   el.scrollTop=el.scrollHeight;
 }
-function sendChat(){var inp=e("chat-input"),text=(inp.value||"").trim();if(!text||!myCode)return;inp.value="";db.ref("rooms/"+myCode+"/chat").push({uid:myId,name:myName,text:text,time:nowStr(),type:"msg"});}
-function startLocalTimer(sec,max,phase){clearInterval(timerIv);locSec=sec;locMax=max;locPhase=phase;updRing();timerIv=setInterval(function(){if(!gd||gd.timer_paused)return;if(locSec>0)locSec--;updRing();},1000);}
-function updRing(){var m=Math.floor(locSec/60).toString().padStart(2,"0"),s=(locSec%60).toString().padStart(2,"0");var rt=e("rtime");if(rt)rt.textContent=m+":"+s;var ring=e("rpg");if(!ring)return;ring.style.strokeDashoffset=364.42*(1-locSec/Math.max(locMax,1));ring.style.stroke=locSec<15?"var(--red)":locSec<30?"var(--gold)":locPhase==="night"?"var(--purple)":"var(--gold)";}
+function sendChat(){
+  var inp=e("chat-input"),text=(inp.value||"").trim();
+  if(!text||!myCode)return;
+  inp.value="";
+  db.ref("rooms/"+myCode+"/chat").push({uid:myId,name:myName,text:text,time:nowStr(),type:"msg"});
+}
+
+function startLocalTimer(sec,max,phase){
+  clearInterval(timerIv);
+  locSec=sec;locMax=max;locPhase=phase;
+  updRing();
+  timerIv=setInterval(function(){
+    if(!gd||gd.timer_paused)return;
+    if(locSec>0)locSec--;
+    updRing();
+  },1000);
+}
+function updRing(){
+  var m=Math.floor(locSec/60).toString().padStart(2,"0"),s=(locSec%60).toString().padStart(2,"0");
+  var rt=e("rtime");if(rt)rt.textContent=m+":"+s;
+  var ring=e("rpg");if(!ring)return;
+  ring.style.strokeDashoffset=364.42*(1-locSec/Math.max(locMax,1));
+  ring.style.stroke=locSec<15?"var(--red)":locSec<30?"var(--gold)":locPhase==="night"?"var(--purple)":"var(--gold)";
+}
+
 function renderTimerTab(phase,round){
   var tn=e("tphn");if(tn)tn.textContent=(phase==="night"?"🌙 Ніч":"☀️ Обговорення")+" "+round;
   var pill=e("tm-pill");if(pill)pill.className="hpill "+(phase==="night"?"pn":"pd");
   var log=gd.log||[],gl=e("glog");
-  if(gl)gl.innerHTML=log.length?[...log].reverse().slice(0,20).map(function(l){return "<div class='log-item'><span class='lt'>"+esc(l.time)+"</span><span class='lx'>"+esc(l.text)+"</span></div>";}).join(""):"<div style='color:var(--muted);font-size:11px;text-align:center;padding:12px'>Подій ще не було</div>";
-  var htc=e("host-timer-ctrl");if(htc&&isHost)htc.innerHTML="<div style='display:flex;gap:7px;justify-content:center;margin-top:10px'><button style='flex:1;padding:10px;background:var(--s3);border:1px solid var(--b2);border-radius:5px;color:var(--gold);font-family:Jost,sans-serif;font-size:12px;font-weight:600;cursor:pointer' onclick='hostNextPhase()'>⏭ Наступна фаза</button></div>";
+  if(gl)gl.innerHTML=log.length?[...log].reverse().slice(0,20).map(function(l){
+    return "<div class='log-item'><span class='lt'>"+esc(l.time)+"</span><span class='lx'>"+esc(l.text)+"</span></div>";
+  }).join(""):"<div style='color:var(--muted);font-size:11px;text-align:center;padding:12px'>Подій ще не було</div>";
+  var htc=e("host-timer-ctrl");
+  if(htc&&isHost)htc.innerHTML="<div style='display:flex;gap:7px;justify-content:center;margin-top:10px'><button style='flex:1;padding:10px;background:var(--s3);border:1px solid var(--b2);border-radius:5px;color:var(--gold);font-family:Jost,sans-serif;font-size:12px;font-weight:600;cursor:pointer' onclick='hostNextPhase()'>⏭ Наступна фаза</button></div>";
 }
+
 function renderHostControls(phase,round,arr){
   var hpc=e("host-player-ctrl");if(!hpc)return;
-  var alive=arr.filter(function(p){return p.alive&&p.uid!==myId;});
-  if(phase==="night"){hpc.innerHTML="<div class='hctrl'><div class='hctrl-title'>🌙 Управління ніччю</div>"+alive.map(function(p){return "<button class='hc-btn danger' onclick='hostKill(\""+p.uid+"\")'>💀 "+esc(p.name)+" загинув</button>";}).join("")+"<button class='hc-btn primary' onclick='hostMorning()'>☀️ Ніхто не загинув — Ранок</button></div>";}
-  else{hpc.innerHTML="<div class='hctrl'><div class='hctrl-title'>Управління днем</div><button class='hc-btn primary' onclick='hostForceVote()'>🗳 Підбити голосування</button></div>";}
+  if(phase==="night"){
+    hpc.innerHTML="<div class='hctrl'><div class='hctrl-title'>🌙 Управління ніччю</div>"+
+      "<button class='hc-btn primary' onclick='hostResolveNight()'>☀️ Вирішити ніч і почати день</button>"+
+      "<button class='hc-btn' onclick='hostMorning()'>⏭ Пропустити (ніхто не помер)</button></div>";
+  }else{
+    hpc.innerHTML="<div class='hctrl'><div class='hctrl-title'>Управління днем</div>"+
+      "<button class='hc-btn primary' onclick='hostForceVote()'>🗳 Підбити голосування</button></div>";
+  }
 }
-function addLog(text){var log=gd?gd.log||[]:[]; log.push({time:nowStr(),text:text});if(log.length>30)log=log.slice(-30);db.ref("rooms/"+myCode+"/log").set(log);}
-function hostKill(uid){var arr=pArr(),p=arr.find(function(pl){return pl.uid===uid;});if(!p||!confirm("Вбити "+p.name+"?"))return;db.ref("rooms/"+myCode+"/players/"+uid+"/alive").set(false);addLog("💀 Загинув: "+p.name);setTimeout(function(){checkWin();hostMorning();},300);}
-function hostMorning(){var tmax=(gd.mode==="speed")?90:120;db.ref("rooms/"+myCode).update({phase:"day",votes:{},timer_ends:Math.floor(Date.now()/1000)+tmax,timer_max:tmax});addLog("☀️ День "+(gd.round)+" почався");voted=false;selVote=null;goGameTab("sc-players");toast("☀️ День "+gd.round);}
+
+function addLog(text){
+  var log=gd?gd.log||[]:[];
+  log.push({time:nowStr(),text:text});
+  if(log.length>40)log=log.slice(-40);
+  db.ref("rooms/"+myCode+"/log").set(log);
+}
+
+function hostResolveNight(){
+  if(!gd||gd.phase!=="night")return;
+  var actions=gd.actions||{};
+  var arr=pArr();
+  var kills={},protected={},guarded={},sheriffCheck=null,lovers=[];
+
+  Object.keys(actions).forEach(function(uid){
+    var a=actions[uid];
+    var actor=arr.find(function(p){return p.uid===uid;});
+    if(!actor||!actor.alive)return;
+    if(a.role==="mafia"||a.role==="don"){
+      if(a.target)kills[a.target]=(kills[a.target]||0)+1;
+      if(a.target2)kills[a.target2]=(kills[a.target2]||0)+1;
+    }else if(a.role==="maniac"){
+      if(a.target)kills[a.target]=(kills[a.target]||0)+1;
+    }else if(a.role==="doctor"){
+      if(a.target)protected[a.target]=true;
+    }else if(a.role==="guard"){
+      if(a.target)guarded[a.target]=true;
+    }else if(a.role==="sheriff"){
+      sheriffCheck=a.target;
+    }else if(a.role==="cupid"&&a.target&&a.target2){
+      lovers=[a.target,a.target2];
+    }
+  });
+
+  // Apply cupid
+  if(lovers.length===2){
+    db.ref("rooms/"+myCode+"/players/"+lovers[0]+"/role").set("lover");
+    db.ref("rooms/"+myCode+"/players/"+lovers[1]+"/role").set("lover");
+    addLog("💘 Купідон зробив коханців!");
+  }
+
+  // Sheriff result
+  if(sheriffCheck){
+    var targetP=arr.find(function(p){return p.uid===sheriffCheck;});
+    if(targetP){
+      var isMafia=(targetP.role==="mafia")||(targetP.role==="don"?false:false); // don immune
+      var result=targetP.role==="don"?"Мирний (Дон імунний)":(targetP.role==="mafia"?"Мафія":"Мирний");
+      db.ref("rooms/"+myCode+"/sheriffResult").set(targetP.name+" — "+result);
+    }
+  }
+
+  // Resolve kills
+  var died=[];
+  Object.keys(kills).forEach(function(uid){
+    if(protected[uid])return; // doctor saved
+    // maniac kill blocked by guard
+    var isManiacKill=false; // simplified
+    if(guarded[uid]&&isManiacKill)return;
+    var p=arr.find(function(pl){return pl.uid===uid;});
+    if(p&&p.alive){
+      db.ref("rooms/"+myCode+"/players/"+uid+"/alive").set(false);
+      died.push(p.name);
+    }
+  });
+
+  if(died.length){
+    addLog("💀 Загинули: "+died.join(", "));
+  }else{
+    addLog("☀️ Ніхто не загинув цієї ночі");
+  }
+
+  setTimeout(function(){
+    checkWin();
+    hostMorning();
+  },400);
+}
+
+function hostMorning(){
+  var tmax=(gd.mode==="speed")?90:120;
+  nightActionDone=false;selNightTarget=null;selNightTarget2=null;
+  db.ref("rooms/"+myCode).update({
+    phase:"day",votes:{},actions:{},sheriffResult:null,
+    timer_ends:Math.floor(Date.now()/1000)+tmax,timer_max:tmax,nightResolved:true
+  });
+  addLog("☀️ День "+(gd.round||1)+" почався");
+  voted=false;selVote=null;
+  goGameTab("sc-players");
+  toast("☀️ День "+(gd.round||1));
+}
+
 function hostForceVote(){
   db.ref("rooms/"+myCode).get().then(function(snap){
     var room=snap.val(),votes=room.votes||{},arr=Object.values(room.players||{});
-    if(!Object.keys(votes).length){toast("Ніхто не проголосував");hostStartNight(room.round||1);return;}
-    var cnts={};Object.values(votes).forEach(function(uid){cnts[uid]=(cnts[uid]||0)+1;});
-    var maxV=Math.max.apply(null,Object.values(cnts));var cands=Object.keys(cnts).filter(function(uid){return cnts[uid]===maxV;});
-    if(cands.length>1){toast("Нічия! Ніхто не вибуває");hostStartNight(room.round||1);return;}
-    var elim=arr.find(function(p){return p.uid===cands[0];});if(!elim)return;
+    if(!Object.keys(votes).length){
+      toast("Ніхто не проголосував");
+      hostStartNight(room.round||1);
+      return;
+    }
+    var cnts={};
+    Object.values(votes).forEach(function(uid){cnts[uid]=(cnts[uid]||0)+1;});
+    var maxV=Math.max.apply(null,Object.values(cnts));
+    var cands=Object.keys(cnts).filter(function(uid){return cnts[uid]===maxV;});
+    if(cands.length>1){
+      toast("Нічия! Ніхто не вибуває");
+      hostStartNight(room.round||1);
+      return;
+    }
+    var elim=arr.find(function(p){return p.uid===cands[0];});
+    if(!elim)return;
+
+    // Jester win
+    if(elim.role==="jester"){
+      addLog("🤡 Блазень "+elim.name+" виграв!");
+      db.ref("rooms/"+myCode).update({
+        finished:true,win_type:"jester",
+        winners:[{uid:elim.uid,name:elim.name,role:"jester"}]
+      });
+      saveStats("jester",arr);
+      return;
+    }
+
     db.ref("rooms/"+myCode+"/players/"+elim.uid+"/alive").set(false);
-    var r=ROLES[elim.role]||{};addLog("🗳 Вигнано: "+elim.name+(gd.mode!=="hardcore"?" ("+r.name+")":""));
-    setTimeout(function(){checkWin();hostStartNight(room.round||1);},300);
+    var r=ROLES[elim.role]||{};
+    addLog("🗳 Вигнано: "+elim.name+(gd.mode!=="hardcore"?" ("+r.name+")":""));
+    setTimeout(function(){
+      checkWin();
+      hostStartNight(room.round||1);
+    },300);
   });
 }
-function hostStartNight(currentRound){var round=(currentRound||1)+1,tmax=gd.mode==="speed"?30:60;db.ref("rooms/"+myCode).update({phase:"night",round:round,votes:{},timer_ends:Math.floor(Date.now()/1000)+tmax,timer_max:tmax});addLog("🌙 Ніч "+round+" почалась");voted=false;selVote=null;}
-function hostNextPhase(){if(!gd)return;if(gd.phase==="night")hostMorning();else hostForceVote();}
+
+function hostStartNight(currentRound){
+  var round=(currentRound||1)+1;
+  var tmax=gd.mode==="speed"?30:60;
+  nightActionDone=false;selNightTarget=null;selNightTarget2=null;
+  db.ref("rooms/"+myCode).update({
+    phase:"night",round:round,votes:{},actions:{},sheriffResult:null,
+    timer_ends:Math.floor(Date.now()/1000)+tmax,timer_max:tmax,nightResolved:false
+  });
+  addLog("🌙 Ніч "+round+" почалась");
+  voted=false;selVote=null;
+}
+
+function hostNextPhase(){
+  if(!gd)return;
+  if(gd.phase==="night")hostResolveNight();
+  else hostForceVote();
+}
+
 function checkWin(){
   db.ref("rooms/"+myCode+"/players").get().then(function(snap){
-    var arr=Object.values(snap.val()||{}),alive=arr.filter(function(p){return p.alive;});
+    var arr=Object.values(snap.val()||{});
+    var alive=arr.filter(function(p){return p.alive;});
     var mafiaA=alive.filter(function(p){return p.role==="mafia"||p.role==="don";}).length;
-    var cityA=alive.filter(function(p){return!["mafia","don","maniac"].includes(p.role);}).length;
+    var cityA=alive.filter(function(p){return !["mafia","don","maniac"].includes(p.role);}).length;
     var maniacA=alive.filter(function(p){return p.role==="maniac";}).length;
+    var loversA=alive.filter(function(p){return p.role==="lover";});
+
     var win=null,winners=[];
-    if(mafiaA>=cityA+maniacA){win="mafia";winners=alive.filter(function(p){return p.role==="mafia"||p.role==="don";});}
-    else if(mafiaA===0&&maniacA===0){win="citizens";winners=alive.filter(function(p){return p.role!=="maniac";});}
-    else if(maniacA===1&&alive.length===1){win="maniac";winners=alive;}
-    if(win){var wd=WIN_DATA[win]||{};addLog("🏆 "+(wd.title||"Гра завершена!"));db.ref("rooms/"+myCode).update({finished:true,win_type:win,winners:winners.map(function(w){return{uid:w.uid,name:w.name,role:w.role};})});saveStats(win,arr);}
+
+    // Lovers win if only they remain
+    if(loversA.length===2&&alive.length===2){
+      win="lovers";winners=loversA;
+    }
+    else if(mafiaA>=cityA+maniacA&&mafiaA>0){
+      win="mafia";
+      winners=alive.filter(function(p){return p.role==="mafia"||p.role==="don";});
+    }
+    else if(mafiaA===0&&maniacA===0){
+      win="citizens";
+      winners=alive.filter(function(p){return p.role!=="maniac";});
+    }
+    else if(maniacA===1&&alive.length===1){
+      win="maniac";winners=alive;
+    }
+
+    if(win){
+      var wd=WIN_DATA[win]||{};
+      addLog("🏆 "+(wd.title||"Гра завершена!"));
+      db.ref("rooms/"+myCode).update({
+        finished:true,win_type:win,
+        winners:winners.map(function(w){return{uid:w.uid,name:w.name,role:w.role};})
+      });
+      saveStats(win,arr);
+    }
   });
 }
+
 function saveStats(winType,arr){
-  var mp=arr.find(function(p){return p.uid===myId;});if(!mp)return;
+  var mp=arr.find(function(p){return p.uid===myId;});
+  if(!mp)return;
   myStats.games=(myStats.games||0)+1;
-  var isWinner=gd.winners&&Array.isArray(gd.winners)&&gd.winners.some(function(w){return w.uid===myId;});
+  var isWinner=false;
+  if(gd&&gd.winners&&Array.isArray(gd.winners)){
+    isWinner=gd.winners.some(function(w){return w.uid===myId;});
+  }
   if(isWinner)myStats.wins=(myStats.wins||0)+1;
   if(!myStats.roles)myStats.roles={};
   myStats.roles[mp.role]=(myStats.roles[mp.role]||0)+1;
   localStorage.setItem("mafia_stats_"+myId,JSON.stringify(myStats));
   db.ref("players/"+myId).set({name:myName,games:myStats.games,wins:myStats.wins,uid:myId});
 }
+
 function renderStats(){
   var sg=e("stat-grid");
   if(sg)sg.innerHTML="<div class='stat-tile'><div class='stat-big'>"+myStats.games+"</div><div class='stat-lbl'>Всього ігор</div></div><div class='stat-tile'><div class='stat-big'>"+myStats.wins+"</div><div class='stat-lbl'>Перемог</div></div><div class='stat-tile'><div class='stat-big'>"+(myStats.games?Math.round(myStats.wins/myStats.games*100):0)+"%</div><div class='stat-lbl'>Вінрейт</div></div><div class='stat-tile'><div class='stat-big'>"+(myStats.games-myStats.wins)+"</div><div class='stat-lbl'>Поразок</div></div>";
   var rs=e("role-stats"),roles=myStats.roles||{},keys=Object.keys(roles);
-  if(rs)rs.innerHTML=keys.length?keys.sort(function(a,b){return roles[b]-roles[a];}).map(function(k){var r=ROLES[k]||{};return "<div style='display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b1)'><div style='font-size:18px;width:24px;text-align:center'>"+(r.icon||"👤")+"</div><div style='flex:1;font-size:12px'>"+(r.name||k)+"</div><div style='font-size:12px;color:var(--gold);font-weight:600'>"+roles[k]+"x</div></div>";}).join(""):"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Ще немає ігор</div>";
+  if(rs)rs.innerHTML=keys.length?keys.sort(function(a,b){return roles[b]-roles[a];}).map(function(k){
+    var r=ROLES[k]||{};
+    return "<div style='display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b1)'><div style='font-size:18px;width:24px;text-align:center'>"+(r.icon||"👤")+"</div><div style='flex:1;font-size:12px'>"+(r.name||k)+"</div><div style='font-size:12px;color:var(--gold);font-weight:600'>"+roles[k]+"x</div></div>";
+  }).join(""):"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Ще немає ігор</div>";
 }
+
 function loadLB(){
-  var el=e("lb-list");if(el)el.innerHTML="<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Завантаження...</div>";
+  var el=e("lb-list");
+  if(el)el.innerHTML="<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Завантаження...</div>";
   db.ref("players").orderByChild("wins").limitToLast(20).get().then(function(snap){
     var data=snap.val();
     if(!data){if(el)el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Рейтинг порожній</div>";return;}
     var sorted=Object.values(data).filter(function(p){return p.games>0;}).sort(function(a,b){return b.wins-a.wins;});
     var medals=["🥇","🥈","🥉"];
-    if(el)el.innerHTML=sorted.map(function(p,i){var wr=p.games?Math.round(p.wins/p.games*100):0;return "<div class='lb-row fi'><div class='lb-rank'>"+(medals[i]||String(i+1))+"</div><div style='flex:1'><div style='font-size:13px'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div><div class='lb-games'>"+p.games+" ігор · "+wr+"% вінрейт</div></div><div class='lb-wins'>"+p.wins+"🏆</div></div>";}).join("")||"<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Рейтинг порожній</div>";
+    if(el)el.innerHTML=sorted.map(function(p,i){
+      var wr=p.games?Math.round(p.wins/p.games*100):0;
+      return "<div class='lb-row fi'><div class='lb-rank'>"+(medals[i]||String(i+1))+"</div><div style='flex:1'><div style='font-size:13px'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div><div class='lb-games'>"+p.games+" ігор · "+wr+"% вінрейт</div></div><div class='lb-wins'>"+p.wins+"🏆</div></div>";
+    }).join("")||"<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Рейтинг порожній</div>";
   });
 }
+
 function renderRules(){
-  var rr=e("rules-roles");if(rr)rr.innerHTML=Object.values(ROLES).map(function(r){return "<div class='rules-role'><div class='rules-icon'>"+r.icon+"</div><div><div class='rules-role-name'>"+r.name+"</div><div class='rules-role-desc'>"+r.desc+"</div></div></div>";}).join("");
-  var rm=e("rules-modes");if(rm)rm.innerHTML=MODES.map(function(m){return "<div class='rules-role'><div class='rules-icon'>"+m.icon+"</div><div><div class='rules-role-name'>"+m.name+"</div><div class='rules-role-desc'>"+m.desc+"</div></div></div>";}).join("");
+  var rr=e("rules-roles");
+  if(rr)rr.innerHTML=Object.values(ROLES).map(function(r){
+    return "<div class='rules-role'><div class='rules-icon'>"+r.icon+"</div><div><div class='rules-role-name'>"+r.name+"</div><div class='rules-role-desc'>"+r.desc+"</div></div></div>";
+  }).join("");
+  var rm=e("rules-modes");
+  if(rm)rm.innerHTML=MODES.map(function(m){
+    return "<div class='rules-role'><div class='rules-icon'>"+m.icon+"</div><div><div class='rules-role-name'>"+m.name+"</div><div class='rules-role-desc'>"+m.desc+"</div></div></div>";
+  }).join("");
 }
+
 function renderEnd(){
   var wt=gd.win_type||"citizens",wd=WIN_DATA[wt]||WIN_DATA.citizens,winners=gd.winners||[],arr=pArr();
-  var wrows=winners.map(function(w){var r=ROLES[w.role]||{};return "<div class='wrow fi'><div style='font-size:18px;width:24px;text-align:center'>"+esc(r.icon||"👤")+"</div><div style='flex:1'><div style='font-size:13px'>"+esc(w.name)+"</div><div style='font-size:10px;color:var(--muted)'>"+esc(r.name||"")+"</div></div>"+(w.uid===myId?"<span class='pme'>ТИ</span>":"")+"</div>";}).join("");
-  var prows=arr.map(function(p){var r=ROLES[p.role]||{};return "<div class='prow fi' style='"+(p.alive?"":"opacity:.4")+"'><div class='pava'>"+esc(r.icon||"👤")+"</div><div style='flex:1'><div class='pname'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div><div style='font-size:10px;color:var(--muted)'>"+esc(r.name||"")+"</div></div><div class='adot "+(p.alive?"adota":"adotd")+"'></div></div>";}).join("");
-  var ec=e("end-content");if(ec)ec.innerHTML="<div class='win-card fi'><div class='ca "+wd.ca+"'></div><span class='win-emoji'>"+wd.emoji+"</span><div class='win-title'>"+wd.title+"</div><div class='win-sub'>Кінець гри!</div></div>"+(wrows?"<div class='slabel'>Переможці</div>"+wrows:"")+"<div class='slabel' style='margin-top:12px'>Розкриття ролей</div>"+prows+"<button onclick='leaveRoom()' class='btn bs' style='margin-top:12px'>🏠 На головну</button><div style='height:8px'></div>";
+  var wrows=winners.map(function(w){
+    var r=ROLES[w.role]||{};
+    return "<div class='wrow fi'><div style='font-size:18px;width:24px;text-align:center'>"+esc(r.icon||"👤")+"</div><div style='flex:1'><div style='font-size:13px'>"+esc(w.name)+"</div><div style='font-size:10px;color:var(--muted)'>"+esc(r.name||"")+"</div></div>"+(w.uid===myId?"<span class='pme'>ТИ</span>":"")+"</div>";
+  }).join("");
+  var prows=arr.map(function(p){
+    var r=ROLES[p.role]||{};
+    return "<div class='prow fi' style='"+(p.alive?"":"opacity:.4")+"'><div class='pava'>"+esc(r.icon||"👤")+"</div><div style='flex:1'><div class='pname'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div><div style='font-size:10px;color:var(--muted)'>"+esc(r.name||"")+"</div></div><div class='adot "+(p.alive?"adota":"adotd")+"'></div></div>";
+  }).join("");
+  var ec=e("end-content");
+  if(ec)ec.innerHTML="<div class='win-card fi'><div class='ca "+wd.ca+"'></div><span class='win-emoji'>"+wd.emoji+"</span><div class='win-title'>"+wd.title+"</div><div class='win-sub'>Кінець гри!</div></div>"+(wrows?"<div class='slabel'>Переможці</div>"+wrows:"")+"<div class='slabel' style='margin-top:12px'>Розкриття ролей</div>"+prows+"<button onclick='leaveRoom()' class='btn bs' style='margin-top:12px'>🏠 На головну</button><div style='height:8px'></div>";
 }
-function leaveRoom(){if(gameRef)gameRef.off();if(chatRef)chatRef.off();clearInterval(timerIv);voted=false;selVote=null;roleRevealed=false;gd=null;myCode="";isHost=false;showScr("sc-home");}
+
+function leaveRoom(){
+  if(gameRef)gameRef.off();
+  if(chatRef)chatRef.off();
+  clearInterval(timerIv);
+  voted=false;selVote=null;roleRevealed=false;nightActionDone=false;
+  selNightTarget=null;selNightTarget2=null;
+  gd=null;myCode="";isHost=false;
+  showScr("sc-home");
+}
+
 window.addEventListener("DOMContentLoaded",function(){
   var attempts=0;
   function tryInit(){
-    if(typeof firebase!=="undefined"&&firebase.database){initFirebase();initApp();}
-    else if(attempts<30){attempts++;setTimeout(tryInit,200);}
-    else{var l=e("ld");if(l)l.innerHTML="<div style='padding:40px;text-align:center;color:#e74c3c;font-size:16px'>Firebase не завантажився.<br>Перевірте інтернет.</div>";}
+    if(typeof firebase!=="undefined"&&firebase.database){
+      initFirebase();
+      initApp();
+    }else if(attempts<30){
+      attempts++;
+      setTimeout(tryInit,200);
+    }else{
+      var l=e("ld");
+      if(l)l.innerHTML="<div style='padding:40px;text-align:center;color:#e74c3c;font-size:16px'>Firebase не завантажився.<br>Перевірте інтернет.</div>";
+    }
   }
   tryInit();
 });

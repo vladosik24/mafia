@@ -524,27 +524,78 @@ var roomsRef=null;
 function loadRooms(){
   var el=e("rooms-list");
   if(el)el.innerHTML="<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Завантаження...</div>";
+  if(!db){
+    if(el)el.innerHTML="<div style='color:var(--red);text-align:center;padding:18px;font-size:12px'>Firebase не підключено</div>";
+    return;
+  }
   if(roomsRef)roomsRef.off();
-  roomsRef=db.ref("rooms").orderByChild("created").limitToLast(20);
-  roomsRef.on("value",function(snap){renderRoomsList(snap.val());});
+  try{
+    roomsRef=db.ref("rooms").orderByChild("created").limitToLast(30);
+    roomsRef.on("value",function(snap){
+      renderRoomsList(snap.val());
+    },function(err){
+      console.error("Rooms error:",err);
+      var msg=err&&err.message?err.message:"";
+      if(msg.indexOf("PERMISSION_DENIED")!==-1||msg.indexOf("permission_denied")!==-1){
+        if(el)el.innerHTML="<div style='color:var(--red);text-align:center;padding:16px;font-size:12px;line-height:1.6'><b>Permission denied</b><br>Відкрий правила Firebase:<br><code style='font-size:10px;color:var(--gold)'>.read: true, .write: true</code><br><button onclick='loadRooms()' style='margin-top:10px;background:var(--s3);border:1px solid var(--b2);color:var(--gold);padding:8px 14px;border-radius:6px;font-size:11px;cursor:pointer'>↻ Спробувати знову</button></div>";
+        toast("Permission denied — перевір правила Firebase");
+      }else{
+        if(el)el.innerHTML="<div style='color:var(--red);text-align:center;padding:18px;font-size:12px'>Помилка: "+esc(msg)+"<br><button onclick='loadRooms()' style='margin-top:8px;background:var(--s3);border:1px solid var(--b2);color:var(--gold);padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer'>↻ Оновити</button></div>";
+      }
+    });
+  }catch(err){
+    if(el)el.innerHTML="<div style='color:var(--red);text-align:center;padding:18px;font-size:12px'>Помилка завантаження кімнат</div>";
+  }
 }
 
 function renderRoomsList(data){
   var el=e("rooms-list");if(!el)return;
-  if(!data){el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Немає відкритих кімнат</div>";return;}
-  var rooms=Object.values(data).filter(function(r){return !r.finished&&r.code;}).reverse();
-  if(!rooms.length){el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Немає відкритих кімнат</div>";return;}
-  el.innerHTML=rooms.map(function(r){
-    var players=Object.values(r.players||{});
-    var cnt=players.length,mode=r.mode||"classic",started=r.started;
-    var full=started||cnt>=12;
-    var statusText=started?"Гра йде":(cnt>=12?"Повна":"Відкрита");
-    var host=players.find(function(p){return p.isHost;});
-    var hostName=host?esc(host.name):"???";
-    var cls=full?"busy":"avail";
-    var click=full?"":" onclick=\"joinFromList('"+r.code+"')\"";
-    return "<div class='room-card "+cls+"'"+click+"><div class='rc-head'><div class='rc-code'>"+r.code+"</div><div class='rc-badge "+(full?"busy":"open")+"'>"+statusText+"</div></div><div class='rc-info'><span>"+(MI[mode]||"🎮")+" "+(MN[mode]||mode)+"</span><span>👥 "+cnt+" гравців</span><span>"+hostName+"</span></div></div>";
-  }).join("");
+  if(!data){el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Немає активних кімнат</div>";return;}
+
+  // Активні = не завершені
+  var all=Object.values(data).filter(function(r){return r&&r.code&&!r.finished;});
+  // Сортуємо: спочатку відкриті (не started), потім ті що йдуть
+  all.sort(function(a,b){
+    if(!!a.started!==!!b.started)return a.started?1:-1;
+    return (b.created||0)-(a.created||0);
+  });
+
+  if(!all.length){
+    el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Немає активних кімнат<br><span style='font-size:11px'>Створи свою!</span></div>";
+    return;
+  }
+
+  var openRooms=all.filter(function(r){return !r.started;});
+  var playingRooms=all.filter(function(r){return r.started;});
+
+  var html="";
+  if(openRooms.length){
+    html+="<div class='slabel' style='margin-top:0'>Відкриті для входу · "+openRooms.length+"</div>";
+    html+=openRooms.map(function(r){return renderRoomCard(r,false);}).join("");
+  }
+  if(playingRooms.length){
+    html+="<div class='slabel' style='margin-top:12px'>Зараз грають · "+playingRooms.length+"</div>";
+    html+=playingRooms.map(function(r){return renderRoomCard(r,true);}).join("");
+  }
+  el.innerHTML=html;
+}
+
+function renderRoomCard(r,isPlaying){
+  var players=Object.values(r.players||{});
+  var cnt=players.length,mode=r.mode||"classic";
+  var full=isPlaying||cnt>=12;
+  var statusText=isPlaying?"Гра йде":(cnt>=12?"Повна":"Відкрита");
+  var host=players.find(function(p){return p.isHost;});
+  var hostName=host?esc(host.name):"???";
+  var botsCnt=players.filter(function(p){return p.isBot;}).length;
+  var cls=full?"busy":"avail";
+  var click=full?"":" onclick=\"joinFromList('"+r.code+"')\"";
+  var botsInfo=botsCnt?" · 🤖 "+botsCnt:"";
+  return "<div class='room-card "+cls+"'"+click+">"+
+    "<div class='rc-head'><div class='rc-code'>"+r.code+"</div>"+
+    "<div class='rc-badge "+(full?"busy":"open")+"'>"+statusText+"</div></div>"+
+    "<div class='rc-info'><span>"+(MI[mode]||"🎮")+" "+(MN[mode]||mode)+"</span>"+
+    "<span>👥 "+cnt+botsInfo+"</span><span>"+hostName+"</span></div></div>";
 }
 
 function joinFromList(code){var jc=e("join-code");if(jc)jc.value=code;goJoin(code);}
@@ -588,7 +639,14 @@ function createRoom(){
     e("hl-code").textContent=myCode;
     listenRoom(myCode);
     showScr("sc-hlobby");
-  }).catch(function(err){toast("Помилка: "+err.message);});
+  }).catch(function(err){
+    var msg=err&&err.message?err.message:String(err);
+    if(msg.indexOf("PERMISSION_DENIED")!==-1||msg.indexOf("permission_denied")!==-1){
+      toast("Permission denied — відкрий правила Firebase");
+    }else{
+      toast("Помилка: "+msg);
+    }
+  });
 }
 
 function goJoin(codeOverride){
@@ -606,7 +664,15 @@ function goJoin(codeOverride){
     var pc=e("pl-code");if(pc)pc.textContent=code;
     listenRoom(code);
     showScr("sc-plobby");
-  }).catch(function(err){if(err)toast("Помилка: "+err.message);});
+  }).catch(function(err){
+    if(!err)return;
+    var msg=err.message||String(err);
+    if(msg.indexOf("PERMISSION_DENIED")!==-1||msg.indexOf("permission_denied")!==-1){
+      toast("Permission denied — відкрий правила Firebase");
+    }else{
+      toast("Помилка: "+msg);
+    }
+  });
 }
 
 function listenRoom(code){

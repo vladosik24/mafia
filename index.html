@@ -250,11 +250,28 @@ circle.rpg{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dasho
 .ld-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.2s infinite}
 .ld-dot:nth-child(2){animation-delay:.2s}.ld-dot:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.15}40%{opacity:1}}
-
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pulseGold{0%,100%{box-shadow:0 0 0 0 rgba(212,175,98,.3)}50%{box-shadow:0 0 20px 4px rgba(212,175,98,.15)}}
+@keyframes pulseBlood{0%,100%{box-shadow:0 0 0 0 rgba(196,30,58,.25)}50%{box-shadow:0 0 24px 6px rgba(196,30,58,.2)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes roleReveal{0%{opacity:0;transform:scale(.5) rotateY(90deg)}60%{transform:scale(1.08) rotateY(-10deg)}100%{opacity:1;transform:scale(1) rotateY(0)}}
+@keyframes winPop{0%{transform:scale(0);opacity:0}50%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes btnPress{0%{transform:scale(1)}50%{transform:scale(.95)}100%{transform:scale(1)}}
+.fi{animation:fadeUp .35s ease both}
+.anim-scale{animation:scaleIn .4s cubic-bezier(.34,1.56,.64,1) both}
+.anim-slide{animation:slideUp .4s ease both}
+.anim-shake{animation:shake .4s ease}
+.anim-role{animation:roleReveal .6s cubic-bezier(.34,1.2,.64,1) both}
+.anim-win{animation:winPop .5s cubic-bezier(.34,1.56,.64,1) both}
+.pulse-gold{animation:pulseGold 2s ease infinite}
+.pulse-blood{animation:pulseBlood 2s ease infinite}
+.role-emoji.reveal{animation:roleReveal .7s cubic-bezier(.34,1.2,.64,1) both}
+.win-emoji{animation:winPop .6s cubic-bezier(.34,1.56,.64,1) both}
+.btn:active{animation:btnPress .15s ease}
 .toast{position:fixed;bottom:calc(80px + var(--safe-b));left:50%;transform:translateX(-50%) translateY(12px);background:linear-gradient(135deg,var(--gold),#b8953e);color:#0a0a0c;padding:10px 22px;border-radius:24px;font-size:12px;font-weight:700;z-index:1000;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(212,175,98,.3)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.fi{animation:fadeUp .35s ease both}
 </style>
 </head>
 <body>
@@ -431,6 +448,13 @@ circle.rpg{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dasho
       <div id="tg-name-hint" style="font-size:11px;color:var(--muted);margin-bottom:8px;display:none">Ім'я взято з Telegram</div>
       <button class="btn bg" style="margin-bottom:0;padding:10px" onclick="saveName()">Зберегти ім'я</button>
     </div>
+    <div class="slabel">Звук</div>
+    <div class="card" onclick="toggleSfx()" style="cursor:pointer"><div class="ca cag"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><div style="font-size:14px;font-weight:600">Звукові ефекти</div><div style="font-size:11px;color:var(--muted);margin-top:2px" id="sfx-label">Увімкнено</div></div>
+        <div id="sfx-toggle" style="font-size:24px">🔊</div>
+      </div>
+    </div>
     <div class="slabel">Ваш ID</div>
     <div class="card"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Унікальний ідентифікатор</div><div style="font-family:monospace;font-size:13px;color:var(--gold)" id="my-id-d">—</div></div>
     <button class="btn bs" onclick="showScr('sc-home')">← Назад</button><div style="height:8px"></div>
@@ -486,6 +510,77 @@ var db=null;
 var e=function(id){return document.getElementById(id);};
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function toast(msg){var t=e("toast");t.textContent=msg;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2400);}
+
+/* ===== SOUNDS (Web Audio API) ===== */
+var audioCtx=null,sfxOn=localStorage.getItem("mafia_sfx")!=="0";
+function toggleSfx(){
+  sfxOn=!sfxOn;
+  localStorage.setItem("mafia_sfx",sfxOn?"1":"0");
+  var ic=e("sfx-toggle"),lb=e("sfx-label");
+  if(ic)ic.textContent=sfxOn?"🔊":"🔇";
+  if(lb)lb.textContent=sfxOn?"Увімкнено":"Вимкнено";
+  if(sfxOn)SFX.click();
+}
+function updateSfxUI(){
+  var ic=e("sfx-toggle"),lb=e("sfx-label");
+  if(ic)ic.textContent=sfxOn?"🔊":"🔇";
+  if(lb)lb.textContent=sfxOn?"Увімкнено":"Вимкнено";
+}
+function getAudio(){
+  if(!audioCtx){
+    try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(err){return null;}
+  }
+  if(audioCtx.state==="suspended")audioCtx.resume();
+  return audioCtx;
+}
+function playTone(freq,dur,type,vol,slide){
+  if(!sfxOn)return;
+  var ctx=getAudio();if(!ctx)return;
+  try{
+    var osc=ctx.createOscillator();
+    var gain=ctx.createGain();
+    osc.type=type||"sine";
+    osc.frequency.setValueAtTime(freq,ctx.currentTime);
+    if(slide)osc.frequency.linearRampToValueAtTime(slide,ctx.currentTime+dur);
+    gain.gain.setValueAtTime(vol||0.15,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);osc.stop(ctx.currentTime+dur);
+  }catch(err){}
+}
+function playNoise(dur,vol){
+  if(!sfxOn)return;
+  var ctx=getAudio();if(!ctx)return;
+  try{
+    var len=Math.floor(ctx.sampleRate*dur);
+    var buf=ctx.createBuffer(1,len,ctx.sampleRate);
+    var data=buf.getChannelData(0);
+    for(var i=0;i<len;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+    var src=ctx.createBufferSource();
+    var gain=ctx.createGain();
+    src.buffer=buf;
+    gain.gain.setValueAtTime(vol||0.08,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    src.connect(gain);gain.connect(ctx.destination);
+    src.start();
+  }catch(err){}
+}
+var SFX={
+  click:function(){playTone(800,0.06,"sine",0.08);},
+  success:function(){playTone(523,0.1,"sine",0.12);setTimeout(function(){playTone(659,0.12,"sine",0.12);},80);setTimeout(function(){playTone(784,0.15,"sine",0.1);},160);},
+  error:function(){playTone(200,0.2,"sawtooth",0.08,150);},
+  night:function(){playTone(150,0.4,"sine",0.1,80);setTimeout(function(){playNoise(0.3,0.04);},100);},
+  day:function(){playTone(400,0.15,"sine",0.1);setTimeout(function(){playTone(600,0.2,"sine",0.1);},120);},
+  vote:function(){playTone(350,0.08,"triangle",0.1);setTimeout(function(){playTone(280,0.12,"triangle",0.08);},90);},
+  death:function(){playTone(180,0.35,"sawtooth",0.1,60);playNoise(0.4,0.06);},
+  win:function(){playTone(523,0.12,"sine",0.12);setTimeout(function(){playTone(659,0.12,"sine",0.12);},100);setTimeout(function(){playTone(784,0.12,"sine",0.12);},200);setTimeout(function(){playTone(1046,0.3,"sine",0.1);},320);},
+  role:function(){playTone(440,0.15,"triangle",0.1);setTimeout(function(){playTone(880,0.2,"sine",0.08);},150);},
+  start:function(){playTone(330,0.1,"square",0.06);setTimeout(function(){playTone(440,0.1,"square",0.06);},100);setTimeout(function(){playTone(554,0.2,"square",0.08);},200);},
+  chat:function(){playTone(600,0.04,"sine",0.05);}
+};
+// Unlock audio on first tap
+document.addEventListener("touchstart",function(){getAudio();},{once:true,passive:true});
+document.addEventListener("click",function(){getAudio();},{once:true});
 function nowStr(){var d=new Date();return d.getHours().toString().padStart(2,"0")+":"+d.getMinutes().toString().padStart(2,"0");}
 function genId(){return Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,6);}
 function genCode(){var c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",r="";for(var i=0;i<4;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
@@ -591,6 +686,7 @@ function initApp(){
 
   buildGtabs();
   renderModes();renderRules();hideLd();
+  updateSfxUI();
   setTimeout(loadRooms,400);
 
   // Повторні спроби — іноді Telegram віддає user із затримкою
@@ -931,8 +1027,10 @@ function hostFillBots(){
     };
   }
   db.ref("rooms/"+myCode).update(updates).then(function(){
+    SFX.success();
     toast("🤖 Додано "+need+" ботів");
   }).catch(function(err){
+    SFX.error();
     toast("Помилка: "+(err.message||err));
   });
 }
@@ -966,10 +1064,12 @@ function hostStart(){
     nightResolved:false,
     log:[{time:nowStr(),text:"🎮 Гра розпочата. "+arr.length+" гравців. Режим: "+(MN[mode]||mode)}]
   }).then(function(){
+    SFX.start();
     toast("🎮 Гра почалась!");
   }).catch(function(err){
     var msg=err&&err.message?err.message:String(err);
     if(btn){btn.disabled=false;btn.textContent="🎮 Розпочати гру";}
+    SFX.error();
     if(msg.indexOf("PERMISSION")!==-1)toast("Permission denied — перевір правила Firebase");
     else toast("Помилка старту: "+msg);
   });
@@ -1073,7 +1173,12 @@ function renderRoleTab(mp,arr){
   }
   sc.innerHTML="<div class='card fi'><div class='ca "+(caMap[r.t]||"cab")+"'></div><div style='text-align:center;padding:6px 0'><span class='role-emoji'>"+r.icon+"</span><div class='role-title "+tc+"'>"+r.name+"</div><div class='role-desc'>"+r.desc+"</div><div class='role-ab'><div class='ral'>Здібність</div><div class='rat'>"+r.ab+"</div></div></div>"+extra+"</div><div style='text-align:center;margin-top:6px'><button onclick='roleRevealed=false;renderRoleTab(myPlayer(),pArr())' style='background:none;border:1px solid var(--b2);border-radius:4px;color:var(--muted);padding:7px 14px;font-family:Jost,sans-serif;font-size:10px;cursor:pointer'>🙈 Приховати</button></div><div style='height:8px'></div>";
 }
-function revealRole(){roleRevealed=true;renderRoleTab(myPlayer(),pArr());}
+function revealRole(){roleRevealed=true;SFX.role();renderRoleTab(myPlayer(),pArr());
+  setTimeout(function(){
+    var em=document.querySelector(".role-emoji");
+    if(em)em.classList.add("reveal");
+  },50);
+}
 
 function renderPlayers(arr,phase){
   var alive=arr.filter(function(p){return p.alive;}),dead=arr.filter(function(p){return!p.alive;});
@@ -1224,11 +1329,12 @@ function renderVote(arr,mp){
   if(hvc)hvc.innerHTML=isHost?"<button class='btn bs' style='margin-top:8px' onclick='hostForceVote()'>🏁 Завершити голосування</button>":"";
 }
 
-function selV(uid){if(voted||(gd&&gd.votes&&gd.votes[myId]))return;selVote=uid;renderVote(pArr(),myPlayer());}
+function selV(uid){if(voted||(gd&&gd.votes&&gd.votes[myId]))return;selVote=uid;SFX.click();renderVote(pArr(),myPlayer());}
 function submitVote(){
   if(!selVote||voted)return;
   voted=true;
   db.ref("rooms/"+myCode+"/votes/"+myId).set(selVote);
+  SFX.vote();
   toast("✓ Голос зараховано!");
   var arr=pArr(),aliveCount=arr.filter(function(p){return p.alive;}).length;
   db.ref("rooms/"+myCode+"/votes").get().then(function(snap){
@@ -1251,6 +1357,7 @@ function sendChat(){
   var inp=e("chat-input"),text=(inp.value||"").trim();
   if(!text||!myCode)return;
   inp.value="";
+  SFX.chat();
   db.ref("rooms/"+myCode+"/chat").push({uid:myId,name:myName,text:text,time:nowStr(),type:"msg"});
 }
 
@@ -1352,7 +1459,7 @@ function hostResolveNight(){
     }
   });
 
-  if(died.length)addLog("💀 Загинули: "+died.join(", "));
+  if(died.length){addLog("💀 Загинули: "+died.join(", "));SFX.death();}
   else addLog("☀️ Ніхто не загинув цієї ночі");
 
   setTimeout(function(){
@@ -1370,6 +1477,7 @@ function hostMorning(){
   });
   addLog("☀️ День "+(gd.round||1)+" почався");
   voted=false;selVote=null;
+  SFX.day();
   goGameTab("sc-players");
   toast("☀️ День "+(gd.round||1));
 }
@@ -1407,6 +1515,7 @@ function hostForceVote(){
     db.ref("rooms/"+myCode+"/players/"+elim.uid+"/alive").set(false);
     var r=ROLES[elim.role]||{};
     addLog("🗳 Вигнано: "+elim.name+(gd.mode!=="hardcore"?" ("+r.name+")":""));
+    SFX.death();
     setTimeout(function(){
       checkWin();
       hostStartNight(room.round||1);
@@ -1424,6 +1533,7 @@ function hostStartNight(currentRound){
   });
   addLog("🌙 Ніч "+round+" почалась");
   voted=false;selVote=null;
+  SFX.night();
 }
 
 function hostNextPhase(){
@@ -1461,6 +1571,7 @@ function checkWin(){
     if(win){
       var wd=WIN_DATA[win]||{};
       addLog("🏆 "+(wd.title||"Гра завершена!"));
+      SFX.win();
       db.ref("rooms/"+myCode).update({
         finished:true,win_type:win,
         winners:winners.map(function(w){return{uid:w.uid,name:w.name,role:w.role};})

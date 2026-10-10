@@ -349,6 +349,7 @@ circle.rpg{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dasho
     <button class="btn bg" id="btn-start" onclick="hostStart()" disabled>🎮 Розпочати гру</button>
     <button class="btn bs" id="btn-fill-bots" onclick="hostFillBots()" style="display:none;border-color:rgba(91,159,212,.3);color:var(--blue)">🤖 Додати ботів (до 6 гравців)</button>
     <button class="btn bs" onclick="leaveRoom()">Покинути</button>
+    <button class="btn br" onclick="deleteRoom()" style="margin-bottom:4px">🗑 Видалити кімнату</button>
   </div>
 </div>
 
@@ -920,7 +921,16 @@ function listenRoom(code){
   gameRef=db.ref("rooms/"+code);
   gameRef.on("value",function(snap){
     var d=snap.val();
-    if(!d)return;
+    if(!d){
+      // Кімнату видалено
+      if(myCode){
+        toast("Кімнату закрито");
+        cleanupLocal();
+        showScr("sc-home");
+        setTimeout(loadRooms,300);
+      }
+      return;
+    }
     gd=d;
     onUpdate();
   });
@@ -1663,17 +1673,54 @@ function renderEnd(){
     return "<div class='prow fi' style='"+(p.alive?"":"opacity:.4")+"'><div class='pava'>"+(p.isBot?"🤖":esc(r.icon||"👤"))+"</div><div style='flex:1'><div class='pname'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+(p.isBot?" 🤖":"")+"</div><div style='font-size:10px;color:var(--muted)'>"+esc(r.name||"")+"</div></div><div class='adot "+(p.alive?"adota":"adotd")+"'></div></div>";
   }).join("");
   var ec=e("end-content");
-  if(ec)ec.innerHTML="<div class='win-card fi'><div class='ca "+wd.ca+"'></div><span class='win-emoji'>"+wd.emoji+"</span><div class='win-title'>"+wd.title+"</div><div class='win-sub'>Кінець гри!</div></div>"+(wrows?"<div class='slabel'>Переможці</div>"+wrows:"")+"<div class='slabel' style='margin-top:12px'>Розкриття ролей</div>"+prows+"<button onclick='leaveRoom()' class='btn bs' style='margin-top:12px'>🏠 На головну</button><div style='height:8px'></div>";
+  var hostDel=isHost?"<button onclick='deleteRoom()' class='btn br' style='margin-top:8px'>🗑 Видалити кімнату</button>":"";
+  if(ec)ec.innerHTML="<div class='win-card fi'><div class='ca "+wd.ca+"'></div><span class='win-emoji'>"+wd.emoji+"</span><div class='win-title'>"+wd.title+"</div><div class='win-sub'>Кінець гри!</div></div>"+(wrows?"<div class='slabel'>Переможці</div>"+wrows:"")+"<div class='slabel' style='margin-top:12px'>Розкриття ролей</div>"+prows+"<button onclick='leaveRoom()' class='btn bs' style='margin-top:12px'>🏠 На головну</button>"+hostDel+"<div style='height:8px'></div>";
 }
 
 function leaveRoom(){
+  var code=myCode;
+  var wasHost=isHost;
+  // Якщо ведучий і гра ще не почалась — видаляємо кімнату
+  if(wasHost&&code&&gd&&!gd.started){
+    db.ref("rooms/"+code).remove().catch(function(){});
+  }else if(code&&myId&&!wasHost){
+    // Звичайний гравець просто виходить
+    db.ref("rooms/"+code+"/players/"+myId).remove().catch(function(){});
+  }
+  cleanupLocal();
+  showScr("sc-home");
+  setTimeout(loadRooms,300);
+}
+
+function deleteRoom(){
+  if(!myCode){toast("Немає кімнати");return;}
+  if(!isHost&&!(gd&&gd.host_uid===myId)){
+    toast("Тільки ведучий може видалити кімнату");
+    return;
+  }
+  if(!confirm("Видалити кімнату "+myCode+"? Усі гравці будуть відключені."))return;
+  var code=myCode;
+  db.ref("rooms/"+code).remove().then(function(){
+    SFX.success();
+    toast("🗑 Кімнату видалено");
+    cleanupLocal();
+    showScr("sc-home");
+    setTimeout(loadRooms,300);
+  }).catch(function(err){
+    SFX.error();
+    var msg=err&&err.message?err.message:String(err);
+    if(msg.indexOf("PERMISSION")!==-1)toast("Permission denied — перевір правила Firebase");
+    else toast("Помилка: "+msg);
+  });
+}
+
+function cleanupLocal(){
   if(gameRef)gameRef.off();
   if(chatRef)chatRef.off();
   clearInterval(timerIv);
   voted=false;selVote=null;roleRevealed=false;nightActionDone=false;botsActed=false;
   selNightTarget=null;selNightTarget2=null;
   gd=null;myCode="";isHost=false;
-  showScr("sc-home");
 }
 
 window.addEventListener("DOMContentLoaded",function(){

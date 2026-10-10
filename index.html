@@ -1376,7 +1376,11 @@ function saveStats(winType,arr){
   if(!myStats.roles)myStats.roles={};
   myStats.roles[mp.role]=(myStats.roles[mp.role]||0)+1;
   localStorage.setItem("mafia_stats_"+myId,JSON.stringify(myStats));
-  db.ref("players/"+myId).set({name:myName,games:myStats.games,wins:myStats.wins,uid:myId});
+  try{
+    db.ref("players/"+myId).set({name:myName,games:myStats.games,wins:myStats.wins,uid:myId}).catch(function(err){
+      console.warn("Stats save failed:",err);
+    });
+  }catch(err){console.warn("Stats save:",err);}
 }
 
 function renderStats(){
@@ -1389,18 +1393,34 @@ function renderStats(){
   }).join(""):"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Ще немає ігор</div>";
 }
 
+function renderLBData(data,el){
+  if(!data){el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Рейтинг порожній<br><span style='font-size:11px'>Зіграй гру — з'явишся тут</span></div>";return;}
+  var sorted=Object.values(data).filter(function(p){return p&&(p.games>0||p.wins>0);}).sort(function(a,b){return (b.wins||0)-(a.wins||0);});
+  if(!sorted.length){el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Рейтинг порожній<br><span style='font-size:11px'>Зіграй гру — з'явишся тут</span></div>";return;}
+  var medals=["🥇","🥈","🥉"];
+  el.innerHTML=sorted.slice(0,30).map(function(p,i){
+    var wr=p.games?Math.round((p.wins||0)/p.games*100):0;
+    return "<div class='lb-row fi'><div class='lb-rank'>"+(medals[i]||String(i+1))+"</div><div style='flex:1'><div style='font-size:13px'>"+esc(p.name||"Гравець")+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div><div class='lb-games'>"+(p.games||0)+" ігор · "+wr+"% вінрейт</div></div><div class='lb-wins'>"+(p.wins||0)+"🏆</div></div>";
+  }).join("");
+}
+
 function loadLB(){
   var el=e("lb-list");
-  if(el)el.innerHTML="<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Завантаження...</div>";
-  db.ref("players").orderByChild("wins").limitToLast(20).get().then(function(snap){
-    var data=snap.val();
-    if(!data){if(el)el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Рейтинг порожній</div>";return;}
-    var sorted=Object.values(data).filter(function(p){return p.games>0;}).sort(function(a,b){return b.wins-a.wins;});
-    var medals=["🥇","🥈","🥉"];
-    if(el)el.innerHTML=sorted.map(function(p,i){
-      var wr=p.games?Math.round(p.wins/p.games*100):0;
-      return "<div class='lb-row fi'><div class='lb-rank'>"+(medals[i]||String(i+1))+"</div><div style='flex:1'><div style='font-size:13px'>"+esc(p.name)+(p.uid===myId?" <span class='pme'>ТИ</span>":"")+"</div><div class='lb-games'>"+p.games+" ігор · "+wr+"% вінрейт</div></div><div class='lb-wins'>"+p.wins+"🏆</div></div>";
-    }).join("")||"<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Рейтинг порожній</div>";
+  if(!el)return;
+  el.innerHTML="<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px'>Завантаження...</div>";
+  if(!db){el.innerHTML="<div style='color:var(--red);text-align:center;padding:18px;font-size:12px'>Firebase не підключено</div>";return;}
+
+  // Спочатку без orderBy (не потребує індексу)
+  db.ref("players").limitToLast(50).get().then(function(snap){
+    renderLBData(snap.val(),el);
+  }).catch(function(err){
+    var msg=err&&err.message?err.message:String(err);
+    console.error("LB error:",err);
+    if(msg.indexOf("PERMISSION_DENIED")!==-1||msg.indexOf("permission_denied")!==-1){
+      el.innerHTML="<div style='color:var(--red);text-align:center;padding:16px;font-size:12px;line-height:1.6'><b>Permission denied</b><br>У Firebase Rules додай доступ до <code style='color:var(--gold)'>players</code><br><button onclick='loadLB()' style='margin-top:10px;background:var(--s3);border:1px solid var(--b2);color:var(--gold);padding:8px 14px;border-radius:6px;font-size:11px;cursor:pointer'>↻ Спробувати знову</button></div>";
+    }else{
+      el.innerHTML="<div style='color:var(--red);text-align:center;padding:16px;font-size:12px'>Помилка: "+esc(msg)+"<br><button onclick='loadLB()' style='margin-top:8px;background:var(--s3);border:1px solid var(--b2);color:var(--gold);padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer'>↻ Оновити</button></div>";
+    }
   });
 }
 

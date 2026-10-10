@@ -9,11 +9,11 @@
 <script src="https://cdn.jsdelivr.net/npm/firebase@9.23.0/firebase-database-compat.js"></script>
 <style>
 :root{
-  --bg:#07070a;--s1:#0f0f14;--s2:#16161e;--s3:#1e1e28;
+  --bg:#09090b;--s1:#0f0f14;--s2:#17171d;--s3:#1e1e26;
   --b1:#ffffff0d;--b2:#ffffff16;
-  --gold:#c8a84b;--gold2:#e8c96b;
-  --red:#e74c3c;--blue:#5dade2;--green:#2ecc71;--purple:#c084fc;
-  --text:#ede8df;--muted:#6e6a78;--muted2:#9e9aaa;
+  --gold:#d4af62;--gold2:#e8c96b;
+  --red:#8f2635;--red2:#c0392b;--blue:#5dade2;--green:#2ecc71;--purple:#c084fc;
+  --text:#f0ebe3;--muted:#6e6a78;--muted2:#9e9aaa;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Jost",sans-serif;overflow:hidden;user-select:none}
@@ -50,7 +50,7 @@ header::after{content:"";position:absolute;bottom:-1px;left:15%;right:15%;height
 .inp.code-inp{font-family:"Playfair Display",serif;font-size:26px;letter-spacing:6px;text-align:center;text-transform:uppercase}
 .btn{width:100%;padding:13px;border:none;border-radius:6px;font-family:"Jost",sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:opacity .2s;margin-bottom:8px}
 .btn:active{opacity:.8}.btn:disabled{opacity:.3;cursor:not-allowed}
-.bg{background:var(--gold);color:#07070a}.br{background:var(--red);color:#fff}
+.bg{background:var(--gold);color:#09090b}.br{background:var(--red2);color:#fff}
 .bs{background:var(--s3);color:var(--muted2);border:1px solid var(--b2)}
 .slabel{font-size:9px;font-weight:600;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;margin-top:2px}
 .prow{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:10px 12px;margin-bottom:7px;position:relative;overflow:hidden}
@@ -58,13 +58,27 @@ header::after{content:"";position:absolute;bottom:-1px;left:15%;right:15%;height
 .pava{width:32px;height:32px;border-radius:50%;background:var(--s3);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .pname{flex:1;font-size:13px}.pme{font-size:9px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-left:4px}
 .adot{width:6px;height:6px;border-radius:50%;flex-shrink:0}.adota{background:var(--green)}.adotd{background:var(--red)}
-.user-card{display:flex;align-items:center;gap:12px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px 14px;margin-bottom:12px}
-.user-ava{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#7a5c10);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:2px solid #c8a84b44}
-.user-name{font-size:15px;font-weight:600;margin-bottom:2px}.user-stat{font-size:11px;color:var(--muted)}
-.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.menu-btn{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:14px 10px;text-align:center;cursor:pointer;transition:border-color .2s;display:flex;flex-direction:column;align-items:center;gap:6px}
-.menu-btn:active{background:var(--s3)}.menu-btn.primary{border-color:#c8a84b33;background:linear-gradient(135deg,#1a1000,var(--s2))}
+.user-card{display:flex;align-items:center;gap:14px;background:linear-gradient(145deg,#1a1210,var(--s2));border:1px solid #d4af6230;border-radius:14px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.user-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
+.user-ava{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#7a5c10);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid #d4af6244;overflow:hidden;position:relative}
+.user-ava img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.user-name{font-size:16px;font-weight:700;margin-bottom:2px;letter-spacing:.3px}
+.user-stat{font-size:11px;color:var(--muted)}
+.user-rank{font-size:10px;color:var(--gold);margin-top:3px;letter-spacing:.5px}
+.user-xp{margin-top:8px;height:4px;background:var(--s3);border-radius:2px;overflow:hidden}
+.user-xp-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;width:0%;transition:width .5s}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.menu-btn{background:var(--s2);border:1px solid var(--b2);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px}
+.menu-btn:active{background:var(--s3);transform:scale(.98)}
+.menu-btn.primary{border-color:#d4af6240;background:linear-gradient(145deg,#1f1608,#17171d);grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px;padding:18px}
+.menu-btn.primary .menu-icon{font-size:28px}
+.menu-btn.primary .menu-label{font-size:14px;letter-spacing:1px}
+.menu-btn.join{border-color:#8f263540;background:linear-gradient(145deg,#1a0a0e,var(--s2))}
 .menu-icon{font-size:24px}.menu-label{font-size:11px;font-weight:600;letter-spacing:.5px}.menu-sub{font-size:10px;color:var(--muted)}
+.rooms-empty{text-align:center;padding:28px 16px;background:var(--s2);border:1px dashed var(--b2);border-radius:12px}
+.rooms-empty-icon{font-size:36px;margin-bottom:10px;opacity:.6}
+.rooms-empty-title{font-family:"Playfair Display",serif;font-size:16px;color:var(--muted2);margin-bottom:6px}
+.rooms-empty-sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5}
 .room-card{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:12px 13px;margin-bottom:8px;cursor:pointer;transition:border-color .2s;position:relative;overflow:hidden}
 .room-card:active{background:var(--s3)}.room-card.avail{border-color:#2ecc7122}
 .room-card.avail::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
@@ -203,18 +217,26 @@ circle.rpg{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dasho
 
 <!-- HOME -->
 <div class="screen" id="sc-home">
-  <header><div class="logo">Мафіознік 🇺🇦</div><div class="hpill pl">Онлайн</div></header>
+  <header><div class="logo">Мафіознік 🇺🇦</div><div class="hpill pl" id="server-status">Онлайн</div></header>
   <div class="scroll fi">
-    <div class="user-card"><div class="user-ava" id="user-ava">😎</div><div><div class="user-name" id="user-name-d">Гравець</div><div class="user-stat" id="user-stat-d">Готовий до гри</div></div></div>
+    <div class="user-card">
+      <div class="user-ava" id="user-ava">😎</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name" id="user-name-d">Гравець</div>
+        <div class="user-rank" id="user-rank">Мафіозник-початківець</div>
+        <div class="user-stat" id="user-stat-d">Готовий до гри</div>
+        <div class="user-xp"><div class="user-xp-bar" id="user-xp-bar" style="width:5%"></div></div>
+      </div>
+    </div>
     <div class="menu-grid">
-      <div class="menu-btn primary" onclick="showScr('sc-create')"><div class="menu-icon">🎮</div><div class="menu-label">Створити гру</div><div class="menu-sub">Нова кімната</div></div>
-      <div class="menu-btn" onclick="showScr('sc-join')"><div class="menu-icon">🚪</div><div class="menu-label">Приєднатись</div><div class="menu-sub">За кодом</div></div>
+      <div class="menu-btn primary" onclick="showScr('sc-create')"><div class="menu-icon">🎮</div><div><div class="menu-label">Створити гру</div><div class="menu-sub">Нова кімната</div></div></div>
+      <div class="menu-btn join" onclick="showScr('sc-join')"><div class="menu-icon">🚪</div><div class="menu-label">Приєднатись</div><div class="menu-sub">За кодом</div></div>
       <div class="menu-btn" onclick="renderStats();showScr('sc-stats')"><div class="menu-icon">📊</div><div class="menu-label">Статистика</div><div class="menu-sub">Мої результати</div></div>
       <div class="menu-btn" onclick="loadLB();showScr('sc-lb')"><div class="menu-icon">🏆</div><div class="menu-label">Рейтинг</div><div class="menu-sub">Топ гравців</div></div>
-      <div class="menu-btn" onclick="showScr('sc-rules')"><div class="menu-icon">ℹ️</div><div class="menu-label">Правила</div><div class="menu-sub">Як грати</div></div>
+      <div class="menu-btn" onclick="showScr('sc-rules')"><div class="menu-icon">📖</div><div class="menu-label">Правила</div><div class="menu-sub">Як грати</div></div>
       <div class="menu-btn" onclick="showScr('sc-settings')"><div class="menu-icon">⚙️</div><div class="menu-label">Налаштування</div><div class="menu-sub">Профіль</div></div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div class="slabel" style="margin:0">Відкриті кімнати</div><button onclick="loadRooms()" style="background:none;border:none;color:var(--gold);font-family:Jost,sans-serif;font-size:11px;cursor:pointer">↻ Оновити</button></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div class="slabel" style="margin:0">Активні кімнати</div><button onclick="loadRooms()" style="background:none;border:none;color:var(--gold);font-family:Jost,sans-serif;font-size:11px;cursor:pointer">↻ Оновити</button></div>
     <div id="rooms-list"><div style="color:var(--muted);text-align:center;padding:16px;font-size:12px">Завантаження...</div></div>
   </div>
   <div class="bnav">
@@ -462,25 +484,31 @@ function initFirebase(){
 }
 
 function initApp(){
-  var tgName=null,tgId=null,tgUser="";
+  var tgName=null,tgId=null,tgUser="",tgPhoto="";
   try{
     if(window.Telegram&&window.Telegram.WebApp){
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
-      var u=window.Telegram.WebApp.initDataUnsafe&&window.Telegram.WebApp.initDataUnsafe.user;
+      var tg=window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+      try{tg.setHeaderColor("#09090b");}catch(e){}
+      try{tg.setBackgroundColor("#09090b");}catch(e){}
+      var u=tg.initDataUnsafe&&tg.initDataUnsafe.user;
       if(u){
-        tgName=((u.first_name||"")+" "+(u.last_name||"")).trim();
+        var fn=(u.first_name||"").trim();
+        var ln=(u.last_name||"").trim();
+        tgName=(fn+(ln?" "+ln:"")).trim()||u.username||"";
         tgId=String(u.id);
         tgUser=u.username||"";
+        tgPhoto=u.photo_url||"";
         fromTelegram=true;
       }
     }
-  }catch(err){}
+  }catch(err){console.warn("TG init:",err);}
 
   myId=tgId||localStorage.getItem("mafia_uid")||genId();
   localStorage.setItem("mafia_uid",myId);
 
-  // Пріоритет імені з Telegram
+  // Пріоритет імені з Telegram — завжди
   if(fromTelegram&&tgName){
     myName=tgName;
     tgUsername=tgUser;
@@ -490,23 +518,53 @@ function initApp(){
     myName=savedName||"Гравець";
   }
 
-  var nd=e("user-name-d");if(nd)nd.textContent=myName+(tgUsername?" @"+tgUsername:"");
-  var sn=e("settings-name");if(sn)sn.value=myName;
+  updateProfileUI(tgPhoto);
+  buildGtabs();
+  renderModes();renderRules();hideLd();
+  setTimeout(loadRooms,400);
+}
+
+function updateProfileUI(photoUrl){
+  var displayName=myName+(tgUsername?" @"+tgUsername:"");
+  var nd=e("user-name-d");if(nd)nd.textContent=displayName||"Гравець";
+  var sn=e("settings-name");if(sn){sn.value=myName;if(fromTelegram)sn.placeholder="З Telegram: "+myName;}
   var mid=e("my-id-d");if(mid)mid.textContent=myId;
 
   if(fromTelegram){
     var hint=e("tg-name-hint");
-    if(hint){hint.style.display="block";hint.textContent="Ім'я взято з Telegram"+(tgUsername?" (@"+tgUsername+")":"");}
+    if(hint){hint.style.display="block";hint.textContent="✓ Ім'я з Telegram"+(tgUsername?" (@"+tgUsername+")":"");}
   }
 
   var savedStats=localStorage.getItem("mafia_stats_"+myId);
   if(savedStats){try{myStats=JSON.parse(savedStats);}catch(err){}}
-  var sd=e("user-stat-d");if(sd)sd.textContent="Ігор: "+myStats.games+" · Перемог: "+myStats.wins;
-  var avs=["😎","🧔","👩","🧑","👱","👩‍💼","🧑‍💼","👨","👩‍🦱"];
-  var av=e("user-ava");if(av)av.textContent=avs[myId.charCodeAt(0)%avs.length];
-  buildGtabs();
-  renderModes();renderRules();hideLd();
-  setTimeout(loadRooms,400);
+  var games=myStats.games||0,wins=myStats.wins||0;
+  var sd=e("user-stat-d");
+  if(sd)sd.textContent="🎮 "+games+" ігор  ·  🏆 "+wins+" перемог";
+
+  var rank=e("user-rank");
+  if(rank){
+    if(games===0)rank.textContent="Мафіозник-початківець";
+    else if(wins>=20)rank.textContent="Дон мафії";
+    else if(wins>=10)rank.textContent="Авторитет";
+    else if(wins>=5)rank.textContent="Авторитетний гравець";
+    else if(games>=5)rank.textContent="Досвідчений";
+    else rank.textContent="Мафіозник-початківець";
+  }
+  var xpBar=e("user-xp-bar");
+  if(xpBar){
+    var xp=Math.min(100,(games*12+wins*8)%100);
+    xpBar.style.width=Math.max(5,xp)+"%";
+  }
+
+  var av=e("user-ava");
+  if(av){
+    if(photoUrl){
+      av.innerHTML="<img src=\""+esc(photoUrl)+"\" alt=\"\" onerror=\"this.parentNode.textContent='😎'\">";
+    }else{
+      var avs=["😎","🧔","👩","🧑","👱","👩‍💼","🧑‍💼","👨","👩‍🦱","🕵️","🕴️","👤"];
+      av.textContent=avs[(myId||"x").charCodeAt(0)%avs.length];
+    }
+  }
 }
 
 function saveName(){
@@ -514,8 +572,7 @@ function saveName(){
   if(!n){toast("Введіть ім'я!");return;}
   myName=n;
   localStorage.setItem("mafia_name",n);
-  var nd=e("user-name-d");
-  if(nd)nd.textContent=n+(tgUsername?" @"+tgUsername:"");
+  updateProfileUI(null);
   toast("✓ Збережено: "+n);
 }
 
@@ -566,7 +623,7 @@ function renderRoomsList(data){
   });
 
   if(!all.length){
-    el.innerHTML="<div style='color:var(--muted);text-align:center;padding:18px;font-size:12px'>Немає активних кімнат<br><span style='font-size:11px'>Створи свою!</span></div>";
+    el.innerHTML="<div class='rooms-empty'><div class='rooms-empty-icon'>🕵️</div><div class='rooms-empty-title'>Місто затихло...</div><div class='rooms-empty-sub'>Поки що немає відкритих ігор</div><button class='btn bg' style='max-width:220px;margin:0 auto' onclick=\"showScr('sc-create')\">🎮 Створити першу кімнату</button></div>";
     return;
   }
 

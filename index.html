@@ -330,6 +330,7 @@ circle.rpg{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dasho
     <div class="slabel">Учасники</div>
     <div class="lobby-players-grid" id="hl-players"></div>
     <button class="btn bg" id="btn-start" onclick="hostStart()" disabled>🎮 Розпочати гру</button>
+    <button class="btn bs" id="btn-fill-bots" onclick="hostFillBots()" style="display:none;border-color:rgba(91,159,212,.3);color:var(--blue)">🤖 Додати ботів (до 6 гравців)</button>
     <button class="btn bs" onclick="leaveRoom()">Покинути</button>
   </div>
 </div>
@@ -834,13 +835,29 @@ function listenRoom(code){
 
 function onUpdate(){
   if(!gd)return;
+  // Відновлюємо статус ведучого з Firebase (після перезавантаження)
+  if(gd.host_uid&&gd.host_uid===myId)isHost=true;
+  else if(gd.players&&gd.players[myId]&&gd.players[myId].isHost)isHost=true;
+
   var phase=gd.phase||"lobby",started=gd.started,finished=gd.finished;
   if(!started&&!finished){
+    // Показуємо правильне лобі
+    if(isHost){
+      if(e("sc-plobby")&&!e("sc-plobby").classList.contains("gone"))showScr("sc-hlobby");
+      var codeEl=e("hl-code");if(codeEl&&gd.code)codeEl.textContent=gd.code;
+    }
     renderLobbyPlayers();
     if(isHost){
       var cnt=Object.keys(gd.players||{}).length;
-      var btn=e("btn-start");if(btn)btn.disabled=cnt<4;
+      var btn=e("btn-start");
+      if(btn){
+        btn.disabled=cnt<4;
+        btn.textContent=cnt<4?("🎮 Потрібно ще "+(4-cnt)+" гравці"):"🎮 Розпочати гру";
+      }
       var hc=e("hl-cnt");if(hc)hc.textContent=cnt;
+      // Кнопка додати ботів якщо мало гравців
+      var fillBtn=e("btn-fill-bots");
+      if(fillBtn)fillBtn.style.display=cnt<4?"block":"none";
     }
     return;
   }
@@ -895,19 +912,66 @@ function renderLobbyPlayers(){
   }).join("")||"<div style='color:var(--muted);text-align:center;padding:14px;font-size:12px;grid-column:1/-1'>Очікуємо...</div>";
 }
 
-function hostStart(){
+function hostFillBots(){
+  if(!isHost||!myCode||!gd)return;
   var arr=pArr();
-  if(arr.length<4){toast("Потрібно мінімум 4 гравці!");return;}
+  var need=Math.max(0,6-arr.length);
+  if(need<=0){toast("Вже достатньо гравців");return;}
+  var usedNames=arr.map(function(p){return p.name;});
+  var updates={};
+  for(var i=0;i<need;i++){
+    var bName=BOT_NAMES[Math.floor(Math.random()*BOT_NAMES.length)];
+    var tries=0;
+    while(usedNames.indexOf(bName)!==-1&&tries<20){bName=BOT_NAMES[Math.floor(Math.random()*BOT_NAMES.length)];tries++;}
+    usedNames.push(bName);
+    var botId="bot_"+genId();
+    updates["players/"+botId]={
+      uid:botId,name:bName,role:"citizen",alive:true,isHost:false,isBot:true,
+      avatar:BOT_AVATARS[i%BOT_AVATARS.length]
+    };
+  }
+  db.ref("rooms/"+myCode).update(updates).then(function(){
+    toast("🤖 Додано "+need+" ботів");
+  }).catch(function(err){
+    toast("Помилка: "+(err.message||err));
+  });
+}
+
+function hostStart(){
+  if(!isHost){
+    // Ще раз перевіряємо
+    if(gd&&(gd.host_uid===myId||(gd.players&&gd.players[myId]&&gd.players[myId].isHost))){
+      isHost=true;
+    }else{
+      toast("Тільки ведучий може почати гру");
+      return;
+    }
+  }
+  var arr=pArr();
+  if(arr.length<4){
+    toast("Потрібно мінімум 4 гравці! Натисни «Додати ботів»");
+    return;
+  }
+  if(!myCode){toast("Немає коду кімнати");return;}
   var mode=gd.mode||"classic";
   var withRoles=assignRoles(arr,mode);
   var playersObj={};
   withRoles.forEach(function(p){playersObj[p.uid]=p;});
   var tmax=mode==="speed"?30:60;
+  var btn=e("btn-start");
+  if(btn){btn.disabled=true;btn.textContent="⏳ Запуск...";}
   db.ref("rooms/"+myCode).update({
     started:true,phase:"night",round:1,players:playersObj,votes:{},actions:{},
     timer_ends:Math.floor(Date.now()/1000)+tmax,timer_max:tmax,
     nightResolved:false,
     log:[{time:nowStr(),text:"🎮 Гра розпочата. "+arr.length+" гравців. Режим: "+(MN[mode]||mode)}]
+  }).then(function(){
+    toast("🎮 Гра почалась!");
+  }).catch(function(err){
+    var msg=err&&err.message?err.message:String(err);
+    if(btn){btn.disabled=false;btn.textContent="🎮 Розпочати гру";}
+    if(msg.indexOf("PERMISSION")!==-1)toast("Permission denied — перевір правила Firebase");
+    else toast("Помилка старту: "+msg);
   });
 }
 

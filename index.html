@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Мафіознік 🇺🇦</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/firebase@9.23.0/firebase-app-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@9.23.0/firebase-database-compat.js"></script>
@@ -483,45 +484,83 @@ function initFirebase(){
   }catch(err){return false;}
 }
 
-function initApp(){
-  var tgName=null,tgId=null,tgUser="",tgPhoto="";
+function readTelegramUser(){
+  var result={name:"",id:"",username:"",photo:""};
   try{
-    if(window.Telegram&&window.Telegram.WebApp){
-      var tg=window.Telegram.WebApp;
-      tg.ready();
-      tg.expand();
-      try{tg.setHeaderColor("#09090b");}catch(e){}
-      try{tg.setBackgroundColor("#09090b");}catch(e){}
-      var u=tg.initDataUnsafe&&tg.initDataUnsafe.user;
-      if(u){
-        var fn=(u.first_name||"").trim();
-        var ln=(u.last_name||"").trim();
-        tgName=(fn+(ln?" "+ln:"")).trim()||u.username||"";
-        tgId=String(u.id);
-        tgUser=u.username||"";
-        tgPhoto=u.photo_url||"";
-        fromTelegram=true;
-      }
-    }
-  }catch(err){console.warn("TG init:",err);}
+    if(!window.Telegram||!window.Telegram.WebApp)return result;
+    var tg=window.Telegram.WebApp;
+    tg.ready();
+    try{tg.expand();}catch(e){}
+    try{tg.setHeaderColor("#09090b");}catch(e){}
+    try{tg.setBackgroundColor("#09090b");}catch(e){}
 
-  myId=tgId||localStorage.getItem("mafia_uid")||genId();
+    var u=null;
+    if(tg.initDataUnsafe&&tg.initDataUnsafe.user){
+      u=tg.initDataUnsafe.user;
+    }
+    // Парсимо initData якщо unsafe порожній
+    if(!u&&tg.initData){
+      try{
+        var params=new URLSearchParams(tg.initData);
+        var userStr=params.get("user");
+        if(userStr)u=JSON.parse(userStr);
+      }catch(e){}
+    }
+    if(u){
+      var fn=(u.first_name||"").trim();
+      var ln=(u.last_name||"").trim();
+      result.name=(fn+(ln?" "+ln:"")).trim()||(u.username||"");
+      result.id=u.id?String(u.id):"";
+      result.username=u.username||"";
+      result.photo=u.photo_url||"";
+    }
+  }catch(err){console.warn("TG read:",err);}
+  return result;
+}
+
+function applyTelegramUser(u){
+  if(!u||!u.name)return false;
+  fromTelegram=true;
+  myName=u.name;
+  tgUsername=u.username||"";
+  if(u.id){
+    myId=u.id;
+    localStorage.setItem("mafia_uid",myId);
+  }
+  localStorage.setItem("mafia_name",myName);
+  updateProfileUI(u.photo||"");
+  return true;
+}
+
+function initApp(){
+  var u=readTelegramUser();
+
+  myId=u.id||localStorage.getItem("mafia_uid")||genId();
   localStorage.setItem("mafia_uid",myId);
 
-  // Пріоритет імені з Telegram — завжди
-  if(fromTelegram&&tgName){
-    myName=tgName;
-    tgUsername=tgUser;
-    localStorage.setItem("mafia_name",tgName);
+  if(u.name){
+    applyTelegramUser(u);
   }else{
     var savedName=localStorage.getItem("mafia_name");
     myName=savedName||"Гравець";
+    updateProfileUI("");
   }
 
-  updateProfileUI(tgPhoto);
   buildGtabs();
   renderModes();renderRules();hideLd();
   setTimeout(loadRooms,400);
+
+  // Повторні спроби — іноді Telegram віддає user із затримкою
+  var tries=0;
+  var retryIv=setInterval(function(){
+    tries++;
+    var again=readTelegramUser();
+    if(again.name){
+      applyTelegramUser(again);
+      clearInterval(retryIv);
+    }
+    if(tries>=8)clearInterval(retryIv);
+  },400);
 }
 
 function updateProfileUI(photoUrl){

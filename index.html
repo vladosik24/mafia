@@ -260,7 +260,7 @@ function update(){
   if(gd.finished){renderEnd();show("end");setSky("dusk");return}
   show("game");
   var key=gd.phase+gd.round;
-  if(key!==lastKey){lastKey=key;sel=null;fresh=true;showPhase(gd.phase)}
+  if(key!==lastKey){var first=!lastKey&&gd.round===1&&gd.phase==="night";lastKey=key;sel=null;fresh=true;if(first)introRole();else showPhase(gd.phase)}
   setSky(gd.phase);
   document.querySelectorAll(".stp").forEach(function(s,i){var o=["night","day","vote"],c=o.indexOf(gd.phase);s.className="stp"+(i===c?" on":i<c?" past":"")});
   $("rnd").textContent="Раунд "+gd.round;
@@ -333,10 +333,12 @@ function sendChat(){var t=$("ci").value.trim(),me=gd&&gd.players[myId];if(!t||!m
 function openRole(){
   var me=gd.players[myId];if(!me)return;var r=R[me.role]||R.citizen,x="";
   if(isM(me)){var tm=arr().filter(function(p){return isM(p)&&p.uid!==myId});if(tm.length)x="<p style='margin-top:10px;color:var(--blood)'>Твоя команда: "+tm.map(function(p){return esc(p.name)}).join(", ")+"</p>"}
-  $("rface").innerHTML="<div class='e'>"+r.i+"</div><h2 class='d'>"+r.n+"</h2><p>"+r.d+"</p>"+x;
+  $("rface").innerHTML="<div class='e'>"+r.i+"</div><h2 class='d'>"+r.n+"</h2><p>"+r.d+"</p>"+x+"<p style='margin-top:14px;font-size:12px;opacity:.55'>Торкнись поза карткою, щоб закрити</p>";
   $("flip").classList.remove("rev");$("modal").classList.add("on");
 }
-function closeRole(){$("modal").classList.remove("on")}
+var intro=false;
+function introRole(){intro=true;openRole();setTimeout(function(){$("flip").classList.add("rev")},900)}
+function closeRole(){$("modal").classList.remove("on");if(intro){intro=false;showPhase(gd.phase)}}
 
 /* host engine */
 function ready(){

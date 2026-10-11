@@ -113,6 +113,10 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.5px;text-align:center;margin:
 .f2{transform:rotateY(180deg);background:linear-gradient(145deg,#1e2250,#0b1020)}
 .f2 .e{font-size:64px}.f2 h2{font-size:24px;margin:8px 0}.f2 p{font-size:14px;opacity:.85}
 .end{text-align:center}.end .e{font-size:80px;display:block;animation:pop .9s both}.end h2{font-size:24px;margin:6px 0 16px}
+#tt{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translate(-50%,20px);z-index:60;background:rgba(255,180,84,.96);color:#1a1204;padding:11px 20px;border-radius:24px;font-weight:600;opacity:0;pointer-events:none;transition:all .3s;max-width:90%;text-align:center}
+#tt.show{opacity:1;transform:translate(-50%,0)}
+.kick{width:26px;height:26px;border-radius:50%;background:rgba(255,77,94,.25);color:#ff8a96;text-align:center;line-height:26px;font-size:13px;flex-shrink:0}
+.brow{display:flex;gap:8px;margin-bottom:10px}.brow .btn{margin:0;padding:12px 4px;font-size:14px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
 </style></head><body>
 <div id="sky" data-p="dusk"><div class="bg b-dusk"></div><div class="bg b-night"></div><div class="bg b-day"></div><div class="bg b-vote"></div><div id="stars"></div><div class="orb"></div><div class="cl" style="top:14%"></div><div class="cl" style="top:26%;animation-delay:-18s;width:90px"></div><svg id="city" viewBox="0 0 400 160" preserveAspectRatio="xMidYMax slice"></svg></div>
@@ -128,11 +132,12 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.5px;text-align:center;margin:
 </section>
 
 <section class="scr" id="lobby">
-  <div class="gl"><div class="lbl" style="text-align:center">Код кімнати</div><div class="code" id="lc">----</div></div>
+  <div class="gl"><div class="lbl" style="text-align:center">Код кімнати · торкнись, щоб скопіювати</div><div class="code" id="lc" onclick="copyCode()">----</div><button class="btn gh" style="margin:12px 0 0" onclick="copyCode()">📋 Копіювати код</button></div>
   <div class="lbl" id="lcnt"></div><div class="grid" id="lp"></div>
   <button class="btn" id="bstart" onclick="hostStart()">Почати гру</button>
-  <button class="btn gh" id="bbots" onclick="fillBots()">🤖 Додати ботів до 6</button>
+  <div class="brow" id="bbots"><button class="btn gh" onclick="addBots(1)">🤖 +1</button><button class="btn gh" onclick="addBots(3)">🤖 +3</button><button class="btn gh" onclick="addBots(-10)">🤖 До 10</button></div>
   <button class="btn gh" onclick="leaveRoom()">Вийти</button>
+  <button class="btn red" id="bdel" onclick="deleteRoom()">🗑 Видалити кімнату</button>
 </section>
 
 <section class="scr" id="game">
@@ -149,17 +154,17 @@ h1{font-size:26px;font-weight:800;letter-spacing:-.5px;text-align:center;margin:
 </div>
 <button id="rolebtn" onclick="openRole()">🎭 Моя роль</button>
 <div id="modal" onclick="closeRole()"><div class="flip" id="flip" onclick="event.stopPropagation();this.classList.add('rev')"><div class="fin"><div class="face f1"><div style="font-size:60px">🤫</div><h2 class="d" style="font-size:20px;margin-top:10px">Твоя роль</h2><p style="opacity:.7;margin-top:6px">Торкнись, щоб відкрити.<br>Переконайся, що ніхто не дивиться</p></div><div class="face f2" id="rface"></div></div></div></div>
-<div id="ov"></div>
+<div id="ov"></div><div id="tt"></div>
 
 <script>
 var $=function(i){return document.getElementById(i)};
-var R={mafia:{i:"🔫",n:"Мафія",d:"Щоночі з командою обираєш жертву."},don:{i:"👑",n:"Дон",d:"Лідер мафії. Шериф бачить тебе мирним."},sheriff:{i:"🕵️",n:"Шериф",d:"Щоночі перевіряєш одного гравця."},doctor:{i:"🩺",n:"Доктор",d:"Щоночі рятуєш одного гравця (можна себе)."},citizen:{i:"🙂",n:"Мирний",d:"Вдень шукай мафію і голосуй."},maniac:{i:"🔪",n:"Маніяк",d:"Граєш сам проти всіх. Вбиваєш щоночі."},jester:{i:"🤡",n:"Блазень",d:"Твоя мета — щоб тебе вигнали голосуванням."}};
-var NIGHT={mafia:["Кого прибрати цієї ночі?","Підтвердити"],don:["Кого прибрати цієї ночі?","Підтвердити"],sheriff:["Кого перевірити?","Перевірити"],doctor:["Кого врятувати?","Врятувати"],maniac:["Кого вбити?","Підтвердити"]};
+var R={mafia:{i:"🔫",n:"Мафія",d:"Щоночі з командою обираєш жертву."},don:{i:"👑",n:"Дон",d:"Лідер мафії. Шериф бачить тебе мирним."},sheriff:{i:"🕵️",n:"Шериф",d:"Щоночі перевіряєш одного гравця."},doctor:{i:"🩺",n:"Доктор",d:"Щоночі рятуєш одного гравця (можна себе)."},citizen:{i:"🙂",n:"Мирний",d:"Вдень шукай мафію і голосуй."},maniac:{i:"🔪",n:"Маніяк",d:"Граєш сам проти всіх. Вбиваєш щоночі."},jester:{i:"🤡",n:"Блазень",d:"Твоя мета — щоб тебе вигнали голосуванням."},guard:{i:"🛡️",n:"Охоронець",d:"Щоночі береш гравця під захист. Якщо його атакують — гинеш замість нього."},courtesan:{i:"💋",n:"Повія",d:"Щоночі відвідуєш гравця — його нічна дія цієї ночі скасовується."},cupid:{i:"💘",n:"Купідон",d:"Першої ночі обираєш двох закоханих. Вони перемагають разом, а коли один гине — гине й другий."}};
+var NIGHT={mafia:["Кого прибрати цієї ночі?","Підтвердити"],don:["Кого прибрати цієї ночі?","Підтвердити"],sheriff:["Кого перевірити?","Перевірити"],doctor:["Кого врятувати?","Врятувати"],maniac:["Кого вбити?","Підтвердити"],guard:["Кого охороняти?","Захистити"],courtesan:["До кого прийти цієї ночі?","Відвідати"],cupid:["Обери двох закоханих","Закохати"]};
 var MODES=[{k:"classic",i:"🎮",n:"Класика"},{k:"bots",i:"🤖",n:"З ботами"},{k:"speed",i:"⚡",n:"Швидка"}];
-var WIN={city:["🎉","Перемога мирних!"],mafia:["😈","Перемога мафії!"],maniac:["🔪","Маніяк переміг!"],jester:["🤡","Блазень переміг!"]};
+var WIN={city:["🎉","Перемога мирних!"],mafia:["😈","Перемога мафії!"],maniac:["🔪","Маніяк переміг!"],jester:["🤡","Блазень переміг!"],lovers:["💕","Закохані перемогли!"]};
 var PH={night:["🌙","Настає ніч","Місто засинає. Мафія прокидається…"],day:["☀️","Настає день","Обговоріть, що сталось уночі"],vote:["🗳","Час голосування","Хто залишає місто?"]};
-var BN=["Алекс","Богдан","Віка","Діма","Єва","Женя","Зоря","Ігор","Катя","Льоша","Маша","Нікіта","Оля","Паша"],BA=["🤖","👾","🦾","🛸","🔮","🎯"],UA=["😎","🧔","👩","🧑","👱","🕵️","🕴️","🦊"];
-var db,myId,myName="Гравець",myCode="",isHost=false,gd=null,gref=null,cref=null,mode="classic",lastKey="",lastAdv="",readyKey="",botsKey="",sel=null,fresh=false,off=0,roomsRef=null;
+var BN=["Алекс","Богдан","Віка","Діма","Єва","Женя","Зоря","Ігор","Катя","Льоша","Маша","Нікіта","Оля","Паша","Роман","Софія","Тарас","Уляна","Федір","Христя"],BA=["🤖","👾","🦾","🛸","🔮","🎯"],UA=["😎","🧔","👩","🧑","👱","🕵️","🕴️","🦊"];
+var db,myId,myName="Гравець",myCode="",isHost=false,gd=null,gref=null,cref=null,mode="classic",lastKey="",lastAdv="",readyKey="",botsKey="",sel=null,sel2=null,fresh=false,off=0,roomsRef=null;
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function now(){return Date.now()+off}
 function gid(){return Math.random().toString(36).slice(2,10)}
@@ -169,7 +174,10 @@ function isM(p){return p.role==="mafia"||p.role==="don"}
 function ava(p){return p.isBot?(p.avatar||"🤖"):UA[String(p.uid).charCodeAt(0)%UA.length]}
 function show(id){document.querySelectorAll(".scr").forEach(function(s){s.classList.toggle("on",s.id===id)});$("rolebtn").style.display=(id==="game")?"block":"none"}
 function setSky(p){$("sky").setAttribute("data-p",p)}
-function toast(t){var o=$("ov");o.innerHTML="<p style='font-size:17px'>"+esc(t)+"</p>";o.className="";void o.offsetWidth;o.className="show"}
+function toast(t){var o=$("tt");o.textContent=t;o.className="show";clearTimeout(toast.h);toast.h=setTimeout(function(){o.className=""},2200)}
+function copyCode(){var c=gd?gd.code:myCode;function ok(){toast("📋 Код "+c+" скопійовано")}
+  function fb(){var t=document.createElement("textarea");t.value=c;document.body.appendChild(t);t.select();try{document.execCommand("copy");ok()}catch(x){toast("Код: "+c)}document.body.removeChild(t)}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(c).then(ok,fb);else fb()}
 
 /* decor */
 (function(){var s="",x=0;while(x<400){var w=18+Math.random()*26|0,h=40+Math.random()*95|0;s+='<rect x="'+x+'" y="'+(160-h)+'" width="'+w+'" height="'+h+'"/>';for(var y=160-h+8;y<150;y+=14)for(var wx=x+5;wx<x+w-6;wx+=9)if(Math.random()<.4)s+='<rect class="w" style="animation-delay:'+(Math.random()*5).toFixed(1)+'s" x="'+wx+'" y="'+y+'" width="3" height="5"/>';x+=w+3}$("city").innerHTML=s;
@@ -194,7 +202,7 @@ function loadRooms(){
   roomsRef=db.ref("rooms").orderByChild("created").limitToLast(20);
   roomsRef.on("value",function(s){
     var l=Object.values(s.val()||{}).filter(function(r){return r&&r.code&&!r.started&&!r.finished}).reverse();
-    $("rooms").innerHTML=l.length?l.map(function(r){var n=Object.keys(r.players||{}).length;return "<div class='room' onclick=\"joinRoom('"+r.code+"')\"><div class='c'>"+r.code+"</div><small>"+n+" гравців</small><span>→</span></div>"}).join(""):"<div class='gl' style='text-align:center;opacity:.8'>Місто затихло. Створи першу кімнату 👆</div>";
+    $("rooms").innerHTML=l.length?l.map(function(r){var n=Object.keys(r.players||{}).length;return "<div class='room' onclick=\"joinRoom('"+r.code+"')\"><div class='c'>"+r.code+"</div><small>"+n+"/12 гравців</small><span>→</span></div>"}).join(""):"<div class='gl' style='text-align:center;opacity:.8'>Місто затихло. Створи першу кімнату 👆</div>";
   });
 }
 
@@ -205,7 +213,7 @@ function createRoom(){
   myCode=c;isHost=true;
   var r={code:c,mode:mode,phase:"lobby",round:1,started:false,finished:false,host_uid:myId,created:Date.now(),players:{}};
   r.players[myId]={uid:myId,name:myName,role:"citizen",alive:true,isHost:true};
-  if(mode==="bots"){var used=[];for(var j=0;j<5;j++){var b=newBot(j,used);r.players[b.uid]=b}}
+  if(mode==="bots"){var used=[];for(var j=0;j<7;j++){var b=newBot(j,used);r.players[b.uid]=b}}
   db.ref("rooms/"+c).set(r).then(function(){listen(c)}).catch(function(e){toast("Помилка: "+e.message)});
 }
 function joinRoom(code){
@@ -216,6 +224,7 @@ function joinRoom(code){
     var inRoom=r.players&&r.players[myId];
     if(r.started&&!inRoom)throw{message:"Гра вже почалась"};
     if(r.finished)throw{message:"Гра завершена"};
+    if(!inRoom&&Object.keys(r.players||{}).length>=12)throw{message:"Кімната повна (12)"};
     myCode=code;isHost=r.host_uid===myId;
     if(!inRoom)return db.ref("rooms/"+code+"/players/"+myId).set({uid:myId,name:myName,role:"citizen",alive:true});
   }).then(function(){if(myCode)listen(myCode)}).catch(function(e){myCode="";toast(e.message||"Помилка")});
@@ -229,20 +238,27 @@ function listen(code){
 }
 function cleanup(){if(gref)gref.off();if(cref)cref.off();gd=null;myCode="";isHost=false;lastKey="";lastAdv="";readyKey="";botsKey="";sel=null;$("cm").innerHTML=""}
 function leaveRoom(){
-  if(myCode){if(isHost&&gd&&!gd.started)db.ref("rooms/"+myCode).remove();else if(!isHost)db.ref("rooms/"+myCode+"/players/"+myId).remove()}
-  cleanup();show("home");setSky("dusk")
+  var c=myCode,h=isHost,st=gd&&gd.started;
+  cleanup();show("home");setSky("dusk");
+  if(c){if(h&&!st)db.ref("rooms/"+c).remove();else if(!h)db.ref("rooms/"+c+"/players/"+myId).remove()}
 }
-function deleteRoom(){if(myCode&&isHost&&confirm("Видалити кімнату?"))db.ref("rooms/"+myCode).remove()}
-function fillBots(){
-  var a=arr(),used=a.map(function(p){return p.name}),u={};
-  for(var i=0;i<6-a.length;i++){var b=newBot(i,used);u["players/"+b.uid]=b}
+function deleteRoom(){
+  if(!myCode||!isHost||!confirm("Видалити кімнату "+myCode+"?"))return;
+  var c=myCode;cleanup();show("home");setSky("dusk");
+  db.ref("rooms/"+c).remove().then(function(){toast("🗑 Кімнату видалено")});
+}
+function kick(u){if(isHost&&u!==myId)db.ref("rooms/"+myCode+"/players/"+u).remove()}
+function addBots(n){
+  var a=arr(),need=n<0?-n-a.length:n;need=Math.min(need,12-a.length);
+  if(need<=0)return toast(a.length>=12?"Ліміт — 12 гравців":"Вже достатньо гравців");
+  var used=a.map(function(p){return p.name}),u={};
+  for(var i=0;i<need;i++){var b=newBot(i+a.length,used);u["players/"+b.uid]=b}
   db.ref("rooms/"+myCode).update(u);
 }
 
 /* start */
 function assign(a){
-  var n=a.length,r=["mafia","sheriff","doctor"];
-  if(n>=5)r.push("citizen");if(n>=6)r.push("don");if(n>=7)r.push("citizen");if(n>=8)r.push("mafia");if(n>=9)r.push("jester");if(n>=10)r.push("maniac");
+  var n=a.length,r=["mafia","sheriff","doctor","citizen","citizen","don","guard","mafia","jester","courtesan","maniac","cupid"].slice(0,n);
   while(r.length<n)r.push("citizen");
   for(var i=n-1;i>0;i--){var j=Math.random()*(i+1)|0,t=r[i];r[i]=r[j];r[j]=t}
   var o={};a.forEach(function(p,i){p.role=r[i];p.alive=true;o[p.uid]=p});return o;
@@ -256,11 +272,12 @@ function hostStart(){
 
 /* UI update */
 function update(){
+  if(!gd.players||!gd.players[myId]){toast("Тебе видалили з кімнати");cleanup();show("home");setSky("dusk");return}
   if(!gd.started){show("lobby");setSky("dusk");renderLobby();return}
   if(gd.finished){renderEnd();show("end");setSky("dusk");return}
   show("game");
   var key=gd.phase+gd.round;
-  if(key!==lastKey){var first=!lastKey&&gd.round===1&&gd.phase==="night";lastKey=key;sel=null;fresh=true;if(first)introRole();else showPhase(gd.phase)}
+  if(key!==lastKey){var first=!lastKey&&gd.round===1&&gd.phase==="night";lastKey=key;sel=null;sel2=null;fresh=true;if(first)introRole();else showPhase(gd.phase)}
   setSky(gd.phase);
   document.querySelectorAll(".stp").forEach(function(s,i){var o=["night","day","vote"],c=o.indexOf(gd.phase);s.className="stp"+(i===c?" on":i<c?" past":"")});
   $("rnd").textContent="Раунд "+gd.round;
@@ -270,9 +287,9 @@ function update(){
 }
 function showPhase(ph){var p=PH[ph],o=$("ov");o.innerHTML="<div class='e'>"+p[0]+"</div><h2 class='d'>"+p[1]+"</h2><p>"+p[2]+"</p>";o.className="";void o.offsetWidth;o.className="show"}
 function renderLobby(){
-  var a=arr();$("lc").textContent=gd.code;$("lcnt").textContent="Гравців: "+a.length+" (мінімум 4)";
-  $("lp").innerHTML=a.map(function(p){return "<div class='pc"+(p.uid===myId?" me":"")+"'><span class='a'>"+ava(p)+"</span><span class='n'>"+esc(p.name)+"</span>"+(p.isHost?"<small>👑</small>":"")+"</div>"}).join("");
-  $("bstart").style.display=isHost?"block":"none";$("bbots").style.display=isHost?"block":"none";
+  var a=arr();$("lc").textContent=gd.code;$("lcnt").textContent="Гравців: "+a.length+" / 12 (мінімум 4)";
+  $("lp").innerHTML=a.map(function(p){return "<div class='pc"+(p.uid===myId?" me":"")+"'><span class='a'>"+ava(p)+"</span><span class='n'>"+esc(p.name)+"</span>"+(p.isHost?"<small>👑</small>":(isHost?"<span class='kick' onclick=\"kick('"+p.uid+"')\">✕</span>":""))+"</div>"}).join("");
+  $("bstart").style.display=isHost?"block":"none";$("bbots").style.display=isHost?"flex":"none";$("bdel").style.display=isHost?"block":"none";
   $("bstart").disabled=a.length<4;$("bstart").textContent=a.length<4?"Ще треба "+(4-a.length):"Почати гру";
 }
 function tick(){
@@ -289,18 +306,21 @@ function playersGrid(){
 function targets(me,self,noMafia){
   return alive().filter(function(p){return(self||p.uid!==myId)&&!(noMafia&&isM(p))});
 }
-function pick(u){sel=u;renderStage()}
+function pick(u){
+  var me=gd.players[myId];
+  if(me&&me.role==="cupid"&&gd.phase==="night"){if(sel===u)sel=null;else if(sel2===u)sel2=null;else if(!sel)sel=u;else sel2=u}else sel=u;
+  renderStage()}
 function renderStage(){
   var me=gd.players[myId],ph=gd.phase,h="",hint="",acts=gd.actions||{},votes=gd.votes||{};
   if(ph==="night"){
     if(gd.lastVote)h+="<div class='gl it news'>"+gd.lastVote+"</div>";
     if(!me||!me.alive){hint="Ти вибув. Спостерігай мовчки 👻";h+="<div class='gl big it'><span class='e'>👻</span></div>"}
-    else if(NIGHT[me.role]){
+    else if(NIGHT[me.role]&&!(me.role==="cupid"&&gd.round>1)){
       var N=NIGHT[me.role];hint=N[0];
       if(acts[myId]){h+="<div class='gl big it'><span class='e'>✅</span>Вибір зроблено.<br>Чекаємо світанку…</div>"}
       else{
-        h+=targets(me,me.role==="doctor",isM(me)).map(function(p,i){return "<div class='tg it"+(sel===p.uid?" sel":"")+"' style='--i:"+i+"' onclick=\"pick('"+p.uid+"')\"><span class='a'>"+ava(p)+"</span><span class='n'>"+esc(p.name)+(p.uid===myId?" (я)":"")+"</span></div>"}).join("");
-        h+="<button class='btn "+(me.role==="doctor"||me.role==="sheriff"?"":"red")+"' "+(sel?"":"disabled")+" onclick='nightAct()'>"+N[1]+"</button>";
+        h+=targets(me,me.role==="doctor"||me.role==="cupid",isM(me)).map(function(p,i){return "<div class='tg it"+(sel===p.uid||sel2===p.uid?" sel":"")+"' style='--i:"+i+"' onclick=\"pick('"+p.uid+"')\"><span class='a'>"+ava(p)+"</span><span class='n'>"+esc(p.name)+(p.uid===myId?" (я)":"")+"</span></div>"}).join("");
+        h+="<button class='btn "+(isM(me)||me.role==="maniac"?"red":"")+"' "+((me.role==="cupid"?sel&&sel2:sel)?"":"disabled")+" onclick='nightAct()'>"+N[1]+"</button>";
       }
     }else{hint="Заплющ очі. Місто спить…";h+="<div class='gl big it'><span class='e'>😴</span>Мафія обирає жертву.<br>Прокинешся вранці.</div>"}
     if(isHost)h+="<button class='btn gh' onclick=\"go('"+gd.phase+gd.round+"')\">⏭ Закінчити ніч</button>";
@@ -319,10 +339,11 @@ function renderStage(){
     if(me&&me.alive&&!done)h+="<button class='btn red' "+(sel?"":"disabled")+" onclick='castVote()'>Вигнати</button>";
     if(isHost)h+="<button class='btn gh' onclick=\"go('"+gd.phase+gd.round+"')\">⏭ Підбити підсумки</button>";
   }
+  if(me&&me.love&&gd.players[me.love])h="<div class='gl it news'>💘 Твоя пара: <b>"+esc(gd.players[me.love].name)+"</b></div>"+h;
   $("hint").textContent=hint;
   var st=$("stage");st.className=fresh?"fresh":"";st.innerHTML=h;
 }
-function nightAct(){if(!sel)return;db.ref("rooms/"+myCode+"/actions/"+myId).set({target:sel});sel=null}
+function nightAct(){if(!sel)return;var o={target:sel};if(sel2)o.target2=sel2;db.ref("rooms/"+myCode+"/actions/"+myId).set(o);sel=null;sel2=null}
 function castVote(){if(!sel)return;db.ref("rooms/"+myCode+"/votes/"+myId).set(sel);sel=null}
 
 /* chat */
@@ -333,6 +354,7 @@ function sendChat(){var t=$("ci").value.trim(),me=gd&&gd.players[myId];if(!t||!m
 function openRole(){
   var me=gd.players[myId];if(!me)return;var r=R[me.role]||R.citizen,x="";
   if(isM(me)){var tm=arr().filter(function(p){return isM(p)&&p.uid!==myId});if(tm.length)x="<p style='margin-top:10px;color:var(--blood)'>Твоя команда: "+tm.map(function(p){return esc(p.name)}).join(", ")+"</p>"}
+  if(me.love&&gd.players[me.love])x+="<p style='margin-top:10px'>💘 Твоя пара: "+esc(gd.players[me.love].name)+"</p>";
   $("rface").innerHTML="<div class='e'>"+r.i+"</div><h2 class='d'>"+r.n+"</h2><p>"+r.d+"</p>"+x+"<p style='margin-top:14px;font-size:12px;opacity:.55'>Торкнись поза карткою, щоб закрити</p>";
   $("flip").classList.remove("rev");$("modal").classList.add("on");
 }
@@ -343,13 +365,13 @@ function closeRole(){$("modal").classList.remove("on");if(intro){intro=false;sho
 /* host engine */
 function ready(){
   var A=alive();
-  if(gd.phase==="night"){var req=A.filter(function(p){return NIGHT[p.role]}),a=gd.actions||{};return req.length>0&&req.every(function(p){return a[p.uid]})}
+  if(gd.phase==="night"){var req=A.filter(function(p){return NIGHT[p.role]&&!(p.role==="cupid"&&gd.round>1)}),a=gd.actions||{};return req.length>0&&req.every(function(p){return a[p.uid]})}
   if(gd.phase==="vote"){var v=gd.votes||{};return A.every(function(p){return v[p.uid]})}
   return false;
 }
 function hostTick(){
   var key=gd.phase+gd.round;
-  if(gd.mode==="bots"&&gd.phase!=="day"&&botsKey!==key){botsKey=key;setTimeout(function(){botsAct(key)},1500+Math.random()*3000)}
+  if(arr().some(function(p){return p.isBot})&&gd.phase!=="day"&&botsKey!==key){botsKey=key;setTimeout(function(){botsAct(key)},1500+Math.random()*3000)}
   if(readyKey!==key&&ready()){readyKey=key;setTimeout(function(){go(key)},1500)}
 }
 function botsAct(key){
@@ -357,7 +379,7 @@ function botsAct(key){
   var A=alive(),u={};
   A.filter(function(p){return p.isBot}).forEach(function(b){
     var t;
-    if(gd.phase==="night"&&NIGHT[b.role]){t=A.filter(function(p){return(b.role==="doctor"||p.uid!==b.uid)&&!(isM(b)&&isM(p))});u["actions/"+b.uid]={target:t[Math.random()*t.length|0].uid}}
+    if(gd.phase==="night"&&NIGHT[b.role]&&!(b.role==="cupid"&&gd.round>1)){t=A.filter(function(p){return(b.role==="doctor"||b.role==="cupid"||p.uid!==b.uid)&&!(isM(b)&&isM(p))});var a1=t[Math.random()*t.length|0],o={target:a1.uid};if(b.role==="cupid"){var a2=t[Math.random()*t.length|0];while(a2.uid===a1.uid&&t.length>1)a2=t[Math.random()*t.length|0];o.target2=a2.uid}u["actions/"+b.uid]=o}
     else if(gd.phase==="vote"){t=A.filter(function(p){return p.uid!==b.uid&&!(isM(b)&&isM(p))});u["votes/"+b.uid]=t[Math.random()*t.length|0].uid}
   });
   if(Object.keys(u).length)db.ref("rooms/"+myCode).update(u);
@@ -368,6 +390,7 @@ function go(key){
 }
 function winCheck(P){
   var all=Object.values(P),a=all.filter(function(p){return p.alive}),m=a.filter(isM).length,mn=a.filter(function(p){return p.role==="maniac"}).length,c=a.length-m-mn;
+  if(a.length===2&&a[0].love===a[1].uid&&a[1].love===a[0].uid)return{t:"lovers",l:a};
   if(!m&&!mn)return{t:"city",l:all.filter(function(p){return!isM(p)&&p.role!=="maniac"&&p.role!=="jester"})};
   if(m&&m>=c+mn)return{t:"mafia",l:all.filter(isM)};
   if(mn&&!m&&c<=1)return{t:"maniac",l:all.filter(function(p){return p.role==="maniac"})};
@@ -378,15 +401,22 @@ function commit(P,patch){
   if(w)db.ref("rooms/"+myCode).update({players:P,finished:true,phase:"end",win:w.t,winners:w.l.map(function(p){return p.uid})});
   else db.ref("rooms/"+myCode).update(Object.assign({players:P},patch));
 }
+function chain(P,dead){var q=dead.slice();while(q.length){var p=P[q.pop()];if(p&&p.love&&P[p.love]&&P[p.love].alive){P[p.love].alive=false;dead.push(p.love);q.push(p.love)}}return dead}
 function resolveNight(){
-  var P=JSON.parse(JSON.stringify(gd.players)),acts=gd.actions||{},mv={},man=null,doc=null,sh=null;
-  Object.keys(acts).forEach(function(u){var t=acts[u].target,p=P[u];if(!p||!p.alive||!t)return;
-    if(isM(p))mv[t]=(mv[t]||0)+1;else if(p.role==="maniac")man=t;else if(p.role==="doctor")doc=t;else if(p.role==="sheriff")sh=t});
+  var P=JSON.parse(JSON.stringify(gd.players)),acts=gd.actions||{},mv={},man=null,doc=null,sh=null,gt=null,gu=null,bl=null,cp=null;
+  Object.keys(acts).forEach(function(u){var p=P[u];if(p&&p.alive&&p.role==="courtesan")bl=acts[u].target});
+  Object.keys(acts).forEach(function(u){var a=acts[u],t=a.target,p=P[u];if(!p||!p.alive||!t||u===bl)return;
+    if(isM(p))mv[t]=(mv[t]||0)+1;else if(p.role==="maniac")man=t;else if(p.role==="doctor")doc=t;else if(p.role==="sheriff")sh=t;
+    else if(p.role==="guard"){gt=t;gu=u}else if(p.role==="cupid"&&gd.round===1&&a.target2&&a.target2!==t&&P[a.target2])cp=[t,a.target2]});
   var best=0,c=[];Object.keys(mv).forEach(function(t){if(mv[t]>best){best=mv[t];c=[t]}else if(mv[t]===best)c.push(t)});
   var k=[];if(c.length)k.push(c[Math.random()*c.length|0]);if(man&&k.indexOf(man)<0)k.push(man);
-  var dead=[];k.forEach(function(t){if(t!==doc&&P[t]&&P[t].alive){P[t].alive=false;dead.push(P[t].name)}});
-  var res=sh&&P[sh]?P[sh].name+" — "+(isM(P[sh])&&P[sh].role==="mafia"?"МАФІЯ 🔴":"мирний 🟢"):null;
-  commit(P,Object.assign({phase:"day",actions:null,votes:null,sheriffRes:res,lastNight:dead.length?"💀 Вночі загинув(ли): <b>"+dead.map(esc).join(", ")+"</b>":"✨ Цієї ночі всі вижили"},T("day")));
+  var dead=[];
+  k.forEach(function(t){if(!P[t]||!P[t].alive||t===doc)return;
+    if(t===gt&&gu&&P[gu].alive){P[gu].alive=false;dead.push(gu)}else{P[t].alive=false;dead.push(t)}});
+  if(cp){P[cp[0]].love=cp[1];P[cp[1]].love=cp[0]}
+  chain(P,dead);
+  var res=sh&&P[sh]?P[sh].name+" — "+(P[sh].role==="mafia"?"МАФІЯ 🔴":"мирний 🟢"):null;
+  commit(P,Object.assign({phase:"day",actions:null,votes:null,sheriffRes:res,lastNight:dead.length?"💀 Вночі загинув(ли): <b>"+dead.map(function(u){return esc(P[u].name)}).join(", ")+"</b>":"✨ Цієї ночі всі вижили"},T("day")));
 }
 function resolveVote(){
   var P=JSON.parse(JSON.stringify(gd.players)),v=gd.votes||{},cn={};
@@ -396,7 +426,8 @@ function resolveVote(){
   if(c.length!==1){next.lastVote="⚖️ Нічия — сьогодні ніхто не вибув";return commit(P,next)}
   var e=P[c[0]];e.alive=false;
   if(e.role==="jester")return db.ref("rooms/"+myCode).update({players:P,finished:true,phase:"end",win:"jester",winners:[e.uid]});
-  next.lastVote="🗳 Вчора вигнали: <b>"+esc(e.name)+"</b> ("+R[e.role].n+")";
+  var ex=chain(P,[e.uid]).slice(1).map(function(u){return esc(P[u].name)});
+  next.lastVote="🗳 Вчора вигнали: <b>"+esc(e.name)+"</b> ("+R[e.role].n+")"+(ex.length?"<br>💔 Слідом загинув(ла): <b>"+ex.join(", ")+"</b>":"");
   commit(P,next);
 }
 
